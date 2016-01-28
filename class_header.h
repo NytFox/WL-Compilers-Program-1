@@ -5,7 +5,7 @@
 #define HT_SIZE 1024					// Hashtable size
 class Symbol {							// Symbol node in the hash table
 public:
-	Symbol(char* s);					// Constructor
+	Symbol(char* s, char* type, char* value);					// Constructor
 	~Symbol();							// Destructor
 	Symbol* Next_bucket();
 
