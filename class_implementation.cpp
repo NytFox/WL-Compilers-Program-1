@@ -1,3 +1,3 @@
 #include <iostream>
-#include "wl_symbol_table.h"
+#include "class_header.h"
 using namespace std;
