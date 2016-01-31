@@ -11,7 +11,7 @@ Symbol_Table::Symbol_Table(){
 Scope* Symbol_Table::Enter_new_scope(){			
 	Scope* new_scope;
 	new_scope = new Scope;
-	new_scope->Upper_scope() = current;
+	new_scope -> New_upper_scope(current);
 	current = new_scope;
 	level++;
 	return current;
@@ -20,7 +20,7 @@ Scope* Symbol_Table::Enter_new_scope(){
 Scope* Symbol_Table::Leave_current_scope(){	
 	Scope* tmp;
 	tmp = current;
-	current = current->Upper_scope();
+	current = current->Return_upper_scope();
 	delete tmp;
 	level--;
 	return current;
@@ -39,7 +39,7 @@ Scope* Symbol_Table::Search_symbol(char* s){
 
 Scope::Scope(){
 	for( int i = 0; i < HT_SIZE ; i++){
-		hashtable[i] = 0;
+		hashtable[i] = NULL;
 		count = 0;
 		upper = NULL;
 	}
@@ -47,7 +47,7 @@ Scope::Scope(){
 
 Symbol* Scope::Empty_table(){
 	for( int i = 0; i < HT_SIZE ; i++){
-		hashtable[i] = 0;
+		hashtable[i] = NULL;
 		count = 0;
 		upper = NULL;
 	}
@@ -56,21 +56,41 @@ Symbol* Scope::Empty_table(){
 }
 
 unsigned int Scope::Hash_value(char* s){
-
+	unsigned hv = 0;
+	while(*s != '\0'){
+		hv = hv + *s;
+		s++;
+	}
+	return hv;
 }
 
 Symbol* Scope::Insert_symbol(char* s, char* type, char* value){
 	int hv = Hash_value(s);
+	if(hashtable[hv] != NULL){
+		Symbol* new_bucket;
+		new_bucket = new Symbol(s);
+		new_bucket -> Give_attributes(type, value);
+		new_bucket -> Next_bucket(hashtable[hv]);
+		hashtable[hv] = new_bucket;
+		count++;
+		return new_bucket;
+	}
 	hashtable[hv] = new Symbol(s);
 	hashtable[hv] -> Give_attributes(type, value);
-	
+	count++;
+	return hashtable[hv];
+
 }
 
-Symbol* Scope::Search_symbol(char* s)(){
-
+Scope* Scope::New_upper_scope(Scope* up){
+	upper = up;
+	return upper;
+}
+Scope* Scope::Return_upper_scope(){
+	return upper;
 }
 
 unsigned int Scope::Count_table_symbols(){
-
+	return count;
 }
 

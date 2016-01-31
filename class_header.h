@@ -8,7 +8,7 @@ public:
 	Symbol(char* s);					// Constructor
 	Symbol* Give_attributes(char* type, char* value);
 	~Symbol();							// Destructor
-	Symbol* Next_bucket();
+	Symbol* Next_bucket(Symbol* next);
 
 private:
 	char* name;							// pointer of the variable
@@ -31,7 +31,8 @@ public:
 	//Symbol* Tail_symbol() { reutrn tail; }	//return the tail symbol
 	unsigned int Count_table_symbols();// return number of symbols in the table
 	unsigned int Hash_value(char* s);
-	Scope* Upper_scope();
+	Scope* New_upper_scope(Scope* up);
+	Scope* Return_upper_scope();
 private:
 	Symbol* hashtable[HT_SIZE];			// define hashtable size
 	//Symbol* head;						// head symbol of the hashtable(first inserted)
