@@ -2,6 +2,7 @@
 #include "class_header.h"
 using namespace std;
 
+
 Symbol_Table::Symbol_Table(){						
 	current = new Scope;
 	head = current;
@@ -32,7 +33,11 @@ Scope* Symbol_Table::Insert_symbol(char* s,char* type, char* value){
 }
 
 Scope* Symbol_Table::Search_symbol(char* s){
-	current->Search_symbol(s);
+    Scope* tmp;
+    tmp=current;
+    while(tmp->Search_symbol(s)==NULL&&tmp->Upper_scope()!=NULL){
+        tmp=tmp->Upper_scope();
+    }
 	return current;
 }
 
@@ -67,10 +72,37 @@ Symbol* Scope::Insert_symbol(char* s, char* type, char* value){
 }
 
 Symbol* Scope::Search_symbol(char* s)(){
+    unsigned int index=Hash_value(char* s);
+    *Symbol ptr=NULL;
+    ptr=hashtable[index];
+    while(ptr!=NULL){
+        if(!strcmp(ptr->name,s))
+            return ptr;
+        else
+            ptr=ptr->Next_bucket;
+    }
+    return NULL;
 
 }
 
 unsigned int Scope::Count_table_symbols(){
 
 }
+
+Symbol::Symbol(char *s){
+    type=NULL;
+    value=NULL;
+    name=s;
+    Next_bucket=NULL;
+    
+}
+Symbol* Symbol::Give_attributes(char* type, char* value){
+    type=type;
+    value=value;
+}
+Symbol* Symbol::Next_bucket(){
+    return Next_bucket;
+}
+
+
 
