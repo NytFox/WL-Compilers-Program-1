@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "class_header.h"
 using namespace std;
 
@@ -35,10 +36,10 @@ Scope* Symbol_Table::Insert_symbol(char* s,char* type, char* value){
 Scope* Symbol_Table::Search_symbol(char* s){
     Scope* tmp;
     tmp=current;
-    while(tmp->Search_symbol(s)==NULL&&tmp->Upper_scope()!=NULL){
-        tmp=tmp->Upper_scope();
+    while(tmp->Search_symbol(s)==NULL&&tmp->Return_upper_scope()!=NULL){
+        tmp=tmp->Return_upper_scope();
     }
-	return current;
+	return tmp;
 }
 
 
@@ -75,7 +76,7 @@ Symbol* Scope::Insert_symbol(char* s, char* type, char* value){
 		Symbol* new_bucket;
 		new_bucket = new Symbol(s);
 		new_bucket -> Give_attributes(type, value);
-		new_bucket -> Next_bucket(hashtable[hv]);
+		new_bucket -> New_next_bucket(hashtable[hv]);
 		hashtable[hv] = new_bucket;
 		count++;
 		return new_bucket;
@@ -84,22 +85,20 @@ Symbol* Scope::Insert_symbol(char* s, char* type, char* value){
 	hashtable[hv] -> Give_attributes(type, value);
 	count++;
 	return hashtable[hv];
+}
 
-<<<<<<< HEAD
-Symbol* Scope::Search_symbol(char* s)(){
-    unsigned int index=Hash_value(char* s);
-    *Symbol ptr=NULL;
+Symbol* Scope::Search_symbol(char* s){
+    unsigned int index = Hash_value(s);
+    Symbol* ptr=NULL;
     ptr=hashtable[index];
     while(ptr!=NULL){
-        if(!strcmp(ptr->name,s))
+        if(!strcmp(ptr->Return_name(),s))
             return ptr;
         else
-            ptr=ptr->Next_bucket;
+            ptr=ptr->Next_bucket();
     }
     return NULL;
-=======
 }
->>>>>>> origin/master
 
 Scope* Scope::New_upper_scope(Scope* up){
 	upper = up;
@@ -117,7 +116,7 @@ Symbol::Symbol(char *s){
     type=NULL;
     value=NULL;
     name=s;
-    Next_bucket=NULL;
+    next_bucket=NULL;
     
 }
 Symbol* Symbol::Give_attributes(char* type, char* value){
@@ -125,8 +124,15 @@ Symbol* Symbol::Give_attributes(char* type, char* value){
     value=value;
 }
 Symbol* Symbol::Next_bucket(){
-    return Next_bucket;
+    return next_bucket;
 }
 
+Symbol* Symbol::New_next_bucket(Symbol* next){
+	next_bucket = next;
+	return next_bucket;
+}
 
+char* Symbol::Return_name(){
+	return name;
+}
 
