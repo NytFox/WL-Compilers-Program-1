@@ -29,6 +29,7 @@ public:
 	//Symbol* Head_symbol() { return head; }	//return the head symbol
 	//Symbol* Tail_symbol() { reutrn tail; }	//return the tail symbol
 	unsigned int Count_table_symbols();// return number of symbols in the table
+	Scope* Upper_scope();
 private:
 	Symbol* hashtable[HT_SIZE];			// define hashtable size
 	//Symbol* head;						// head symbol of the hashtable(first inserted)
@@ -43,11 +44,11 @@ public:
 	Scope* Enter_new_scope();			// enter new scope ( add a new scope to the head of the list)
 	Scope* Leave_current_scope();		// exit the scope (remove current scope from the list)
 	Scope* Currrent_scope();			// return pointer of current scope
-	Scope* Insert_symbol(char* s);
+	Scope* Insert_symbol(char* s, char* type, char* value);
 	Scope* Search_symbol(char* s);
 
 private:
-	Symbol_Table* table;				// pointer of the symboltable
+	Scope* head;						// pointer of the head
 	Scope* current;						// current scope
 	unsigned int level;					// number of scopes in the list
 };
