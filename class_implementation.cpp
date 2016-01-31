@@ -35,3 +35,25 @@ Scope* Symbol_Table::Search_symbol(char* s){
 	current->Search_symbol(s);
 	return current;
 }
+
+
+Scope::Scope(){
+
+}
+
+Scope::Empty_table(){
+
+}
+
+Scope::Insert_symbol(char* s)(){
+
+}
+
+Scope::Search_symbol(char* s)(){
+
+}
+
+unsigned int Scope::Count_table_symbols(){
+
+}
+
