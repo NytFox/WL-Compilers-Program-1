@@ -38,18 +38,35 @@ Scope* Symbol_Table::Search_symbol(char* s){
 
 
 Scope::Scope(){
+	for( int i = 0; i < HT_SIZE ; i++){
+		hashtable[i] = 0;
+		count = 0;
+		upper = NULL;
+	}
+}
+
+Symbol* Scope::Empty_table(){
+	for( int i = 0; i < HT_SIZE ; i++){
+		hashtable[i] = 0;
+		count = 0;
+		upper = NULL;
+	}
+	return hashtable[0];
 
 }
 
-Scope::Empty_table(){
+unsigned int Scope::Hash_value(char* s){
 
 }
 
-Scope::Insert_symbol(char* s)(){
-
+Symbol* Scope::Insert_symbol(char* s, char* type, char* value){
+	int hv = Hash_value(s);
+	hashtable[hv] = new Symbol(s);
+	hashtable[hv] -> Give_attributes(type, value);
+	
 }
 
-Scope::Search_symbol(char* s)(){
+Symbol* Scope::Search_symbol(char* s)(){
 
 }
 

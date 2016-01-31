@@ -5,7 +5,8 @@
 #define HT_SIZE 1024					// Hashtable size
 class Symbol {							// Symbol node in the hash table
 public:
-	Symbol(char* s, char* type, char* value);					// Constructor
+	Symbol(char* s);					// Constructor
+	Symbol* Give_attributes(char* type, char* value);
 	~Symbol();							// Destructor
 	Symbol* Next_bucket();
 
@@ -23,12 +24,13 @@ private:
 class Scope {							// one hashtable for one scope
 public:
 	Scope();
-	Symbol* Empty_table();				// empty current table	
+	Symbol* Empty_table();				// empty current table
 	Symbol* Insert_symbol(char* s, char* type, char* value);		// insert a new symbol
 	Symbol* Search_symbol(char* s);		// search symbol
 	//Symbol* Head_symbol() { return head; }	//return the head symbol
 	//Symbol* Tail_symbol() { reutrn tail; }	//return the tail symbol
 	unsigned int Count_table_symbols();// return number of symbols in the table
+	unsigned int Hash_value(char* s);
 	Scope* Upper_scope();
 private:
 	Symbol* hashtable[HT_SIZE];			// define hashtable size
