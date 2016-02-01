@@ -5,20 +5,41 @@ using namespace std;
 int main(){
 	Symbol_Table* new_table;
 	new_table = new Symbol_Table;
-	char* name = "a";
-	char* type = "int";
-	char* value = "5";
-	new_table -> Insert_symbol(name,type,value);
-	cout<<"test1"<<endl;
-	if(new_table -> Search_symbol(name)){
+	new_table -> Insert_symbol("a","int","5");
+	Scope* t;
+	if(t = new_table -> Search_symbol("a")){
 		cout<<"name searched"<<endl;
+		char* tmp=t -> Search_symbol("a") -> type;
+		cout<<tmp<<endl;
 	}
 	else{
 		cout<<"no found"<<endl;
 	}
+	cout<<"level:"<<new_table->level<<endl;
+
 	new_table -> Enter_new_scope();
-	cout<<"test3"<<endl;
+
+	new_table -> Insert_symbol("a","char","10");
+	if(t = new_table -> Search_symbol("a")){
+		cout<<"name searched"<<endl;
+		char* tmp=t -> Search_symbol("a") -> type;
+		cout<<tmp<<endl;
+	}
+	else{
+		cout<<"no found"<<endl;
+	}
+
 	new_table -> Leave_current_scope();
+	new_table -> Insert_symbol("a","bool","100");
+	if(t = new_table -> Search_symbol("a")){
+		cout<<"name searched"<<endl;
+		char* tmp=t -> Search_symbol("a") -> type;
+		cout<<tmp<<endl;
+	}
+	else{
+		cout<<"no found"<<endl;
+	}
+
 	cout<<"test4"<<endl;
 
 

@@ -92,8 +92,10 @@ Symbol* Scope::Search_symbol(char* s){
     Symbol* ptr=NULL;
     ptr=hashtable[index];
     while(ptr!=NULL){
-        if(!strcmp(ptr->Return_name(),s))
+        if(!strcmp(ptr->Return_name(),s)){
+        	cout<<"Name existed"<<endl;
             return ptr;
+        }
         else
             ptr=ptr->Next_bucket();
     }
@@ -119,9 +121,9 @@ Symbol::Symbol(char *s){
     next_bucket=NULL;
     
 }
-Symbol* Symbol::Give_attributes(char* type, char* value){
-    type=type;
-    value=value;
+Symbol* Symbol::Give_attributes(char* t, char* v){
+    type=t;
+    value=v;
 }
 Symbol* Symbol::Next_bucket(){
     return next_bucket;

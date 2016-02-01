@@ -6,15 +6,13 @@
 class Symbol {							// Symbol node in the hash table
 public:
 	Symbol(char* s);					// Constructor
-	Symbol* Give_attributes(char* type, char* value);
+	Symbol* Give_attributes(char* t, char* v);
 	~Symbol();							// Destructor
 	Symbol* Next_bucket();
 	Symbol* New_next_bucket(Symbol* next);
 	char* Return_name();
-	friend class Scope;
-	friend class Symbol_Table;
 
-private:
+public:
 	char* name;							// pointer of the variable
 	Symbol* next_bucket;				// next collinsion variable
 	/*
@@ -37,9 +35,8 @@ public:
 	unsigned int Hash_value(char* s);
 	Scope* New_upper_scope(Scope* up);
 	Scope* Return_upper_scope();
-	friend class Symbol;
-	friend class Symbol_Table;
-private:
+
+public:
 	Symbol* hashtable[HT_SIZE];			// define hashtable size
 	//Symbol* head;						// head symbol of the hashtable(first inserted)
 	//Symbol* tail;						// tail symbol of the hashtable(last inserted)
@@ -55,10 +52,8 @@ public:
 	Scope* Currrent_scope();			// return pointer of current scope
 	Scope* Insert_symbol(char* s, char* type, char* value);
 	Scope* Search_symbol(char* s);
-	friend class Symbol;
-	friend class Scope;
 
-private:
+public:
 	Scope* head;						// pointer of the head
 	Scope* current;						// current scope
 	unsigned int level;					// number of scopes in the list
