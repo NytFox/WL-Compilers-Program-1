@@ -93,7 +93,6 @@ Symbol* Scope::Search_symbol(char* s){
     ptr=hashtable[index];
     while(ptr!=NULL){
         if(!strcmp(ptr->Return_name(),s)){
-        	cout<<"Name existed"<<endl;
             return ptr;
         }
         else
