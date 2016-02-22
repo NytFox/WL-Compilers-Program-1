@@ -1,0 +1,47 @@
+   As an example of using lex and yacc for building a VERY small compiler,
+consider the programming language Trivial, which includes only two
+types of statements,
+
+	assignment of an integer constant
+
+		ID = constant;
+
+	and assignment of an expression consisting of an ID followed by
+        as many "+ constant" subexpressions as wanted.  For example
+
+		ID0 = ID1 + 4 + 5 + 1;
+
+
+   The target machine for our compiler will be an IBM rs6000, which provides
+32 integer register (0-31) and the following two assembly language "templates"
+
+		oril #,r0,rd	// move a constant into register rd. r0 is
+				// hardwired as 0.
+
+AND
+
+		ai  rs,#,rd	// add an integer constant (#) to a source
+				// register and place the contents in rd.
+
+
+   For the sample compiler, all variables will be stored in registers, one
+register per identifier.  Since registers r0-r3 are reserved for other
+purposes, we'll only assign regs r4-r31.
+
+
+Below is a Trivial program, one.t  and its associated assembler, one.s
+
+---------------------- one.t ------------------------------------------
+	this := 4;
+	that := 7;
+	another := that + 2 + 5;
+	yetanother := this + 17;
+	that := yetanother + 3 + 4 + 1;
+
+----------------------- one.s -----------------------------------------
+
+	oril 4,r0,r5
+	oril 7,r0,r6
+	ai   r6,7,r7
+	ai   r5,17,r8
+	ai   r8,8,r6

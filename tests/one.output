@@ -1,0 +1,5 @@
+oril 4,r0,r5
+oril 7,r0,r6
+ai   r6,7,r7
+ai   r5,17,r8
+ai   r8,8,r6
