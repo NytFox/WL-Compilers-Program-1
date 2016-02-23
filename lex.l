@@ -10,7 +10,6 @@ extern "C"
 }
 
 #include "symtab_class_header.h"
-#include "defs.h"
 #include "y.tab.h"
 void process_id();
 int assign_next_register();

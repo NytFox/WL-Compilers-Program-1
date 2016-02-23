@@ -1,7 +1,12 @@
 #ifndef SYMBOL_TABLE_HEADER
 #define SYMBOL_TABLE_HEADER
 
-#define HT_SIZE 1024					// Hashtable size
+#define HT_SIZE 1024
+using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+extern int const_value;						// Hashtable size
 class Symbol {							// Symbol node in the hash table
 public:
 	Symbol(const char* s);					// Constructor

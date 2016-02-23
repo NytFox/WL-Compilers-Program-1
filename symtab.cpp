@@ -1,9 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include "symtab_class_header.h"
-using namespace std;
 
-Symbol_Table* new_table;
 
 Symbol_Table::Symbol_Table(){						
 	current = new Scope;

@@ -1,4 +1,3 @@
-#include "defs.h"
 #include "symtab_class_header.h"
 extern "C"
 {
@@ -7,10 +6,11 @@ extern "C"
 }
 /*  global variable(s), used in the compiler  */
 int const_value;
-
+Symbol_Table* new_table;
 
 main()
 {
+	
         int yyparse();
 
 	/*  first we set up any initialization necessary for the compiler  */

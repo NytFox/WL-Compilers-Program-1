@@ -4,7 +4,6 @@ extern "C"
 	int yylex(void);
 	int yyparse(void);
 }
-#include "defs.h"
 #include "symtab_class_header.h"
 #include <iostream>
 const char *start_expression_string(Symbol symbol);
