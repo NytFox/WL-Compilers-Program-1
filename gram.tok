@@ -16,7 +16,7 @@ void generate_copy(Symbol* symbol,int value);
 {
         int intstuff;
         const char *stringstuff;
-        Symbol *symbolstuff;  
+        Symbol* symbolstuff;  
 }
 
 %token BEGIN_E

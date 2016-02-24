@@ -25,6 +25,7 @@ end									{ return (END_E);	}
 [ \t\n]+							{ /* delete */		}
 
 {Letter}({Letter}|{Digit}|_)*		{ process_id();
+					  /*printf("after process get id %s\n",yylval.symbolstuff->name);*/
 									  return (ID);		}
 
 {IntLit}							{ yylval.intstuff = atoi(yytext);
@@ -50,13 +51,13 @@ void process_id()
 	    like a character string "key" and an integer "register number."
 	*/
 
-	Symbol *t;
+	Symbol* t;
 	if(!(t = new_table -> Search_symbol(yytext)))
 	{
 	   /*  a symbol table entry has a character string "key" taken
                from yytext, and a register "number", in the range 4-31.  */
 
-		new_table -> Insert_symbol(yytext,assign_next_register());
+		t=new_table -> Insert_symbol(yytext,assign_next_register());
 
 
 		printf("search:%s\n",new_table->Search_symbol(yytext)->name);
@@ -68,6 +69,8 @@ void process_id()
 	}
 
 	yylval.symbolstuff = t;
+        /*printf("in process get id %s\n",yylval.symbolstuff->name);*/
+
 }
 
 int assign_next_register()

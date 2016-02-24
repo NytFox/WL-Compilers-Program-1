@@ -7,15 +7,14 @@ extern "C"
 /*  global variable(s), used in the compiler  */
 int const_value;
 Symbol_Table* new_table;
-
 main()
 {
 	
         int yyparse();
 
 	/*  first we set up any initialization necessary for the compiler  */
+	
 	new_table = new Symbol_Table;
-
 	/*  We MIGHT have some code here to spit out any "formatting" that
             the output (assembler ?) requires  before the "real" code
             things like .csect commands, .text,  etc. */

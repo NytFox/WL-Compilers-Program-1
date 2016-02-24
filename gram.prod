@@ -20,9 +20,10 @@ statement  : END_E ';'
 statement  :  ID ASG INTLITERAL ';' 
 		{ 
 			printf("\nWe've seen a int passing\n\n");
-
-			//$$ = $1->name;
-			//generate_copy($1,$3);
+			Symbol* mytest1;
+			mytest1=$1;
+			$$ = $1->name;
+			generate_copy($1,$3);
 		}
 	   |  ID ASG expression ';' 
 		{ 

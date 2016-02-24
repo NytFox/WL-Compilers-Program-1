@@ -51,7 +51,6 @@ Symbol* Symbol_Table::Search_symbol(const char* s){
 	return sym;
 }
 
-
 Scope::Scope(){
 	for( int i = 0; i < HT_SIZE ; i++){
 		hashtable[i] = NULL;
