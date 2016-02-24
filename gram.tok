@@ -6,6 +6,7 @@ extern "C"
 }
 #include "symtab_class_header.h"
 #include <iostream>
+#include <typeinfo>
 const char *start_expression_string(Symbol symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);

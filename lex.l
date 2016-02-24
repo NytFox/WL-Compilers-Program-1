@@ -59,8 +59,6 @@ void process_id()
 
 		t=new_table -> Insert_symbol(yytext,assign_next_register());
 
-
-		printf("search:%s\n",new_table->Search_symbol(yytext)->name);
 	}
 	else
 	{

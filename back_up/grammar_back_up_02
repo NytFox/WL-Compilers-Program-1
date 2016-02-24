@@ -1,0 +1,41 @@
+statement_list  :  statement_list statement
+                | statement
+                ;
+
+statement  	: BEGIN_E ';'
+			{
+
+			}
+			| END_E ';'
+			{
+
+			}
+			| ID '(' ID ')' ';'
+			{
+
+			}
+			| exp
+			;
+
+exp 		: INTLITERAL 							{				}
+			| ID                					{				}
+			| ID ASG exp        					{				}
+			| exp '+' exp        					{				}
+			| exp '-' exp        					{				}
+			| exp '*' exp        					{				}
+			| exp '/' exp        					{				}
+			| exp EXPO exp        					{				}
+			| '(' exp ')'        					{				}
+			;
+
+
+
+
+
+
+
+
+
+
+
+			
