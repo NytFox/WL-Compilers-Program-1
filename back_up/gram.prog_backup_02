@@ -23,16 +23,29 @@ statement  : ID '(' ID ')' ';'
 		}
 		;
 
-statement  : ID ASG expression ';' 
+statement  :  ID ASG INTLITERAL ';' 
+		{ 
+			printf("\nSeen: INT PASSING\n\n");
+			cout<<$1<<$2<<$3<<endl;
+			
+		}	
+	   	|  ID ASG expression ';' 
 		{ 
 			printf("\nSeen: EXP PASSING\n\n");
-			cout<<$1->name<<endl;
+			cout<<$1<<$2<<endl;
 		}
   		;
 
 expression : expression add_op term
 		{
 		    printf("\nSeen: ADD_OP\n\n"); 
+		    cout<<$1<<$2<<endl;
+		}
+		|
+		expression add_op INTLITERAL
+		{
+			printf("\nSeen: ADD_OP\n\n"); 
+			cout<<$1<<$2<<$3<<endl;
 		}
 	    | term
 		{ 
@@ -43,7 +56,14 @@ expression : expression add_op term
 term : term mul_op factor 
 		{
 		    printf("\nSeen: MUL_OP \n\n"); 
+		    cout<<$1<<$2<<endl
 		}
+		|
+		term mul_op INTLITERAL
+		{
+			printf("\nSeen: MUL_OP \n\n"); 
+			cout<<$1<<$2<<$3<<endl;
+		} 
 	   	| factor
 		{ 
 		    printf("Seen: FACTOR \n"); 
@@ -53,19 +73,16 @@ term : term mul_op factor
 factor 	: factor EXPO parentheses
 		{
 			printf("Seen: EXPO_OP\n"); 
+			cout<<$1<<$2<<$3<<endl;
 		}
 		| parentheses
 		{
 			printf("\nSeen: PARENTHESES\n\n"); 
+			cout<<$1<<endl;
 		}
 		| ID
 		{
 			printf("\nSeen: ID\n\n"); 
-			cout<<$1->name<<endl;
-		}
-		| INTLITERAL
-		{
-			printf("\nSeen: INTLITERAL\n\n"); 
 			cout<<$1<<endl;
 		}
 		;

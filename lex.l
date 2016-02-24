@@ -11,6 +11,7 @@ extern "C"
 
 #include "symtab_class_header.h"
 #include "y.tab.h"
+using namespace std;
 void process_id();
 int assign_next_register();
 
