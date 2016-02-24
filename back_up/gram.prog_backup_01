@@ -19,22 +19,21 @@ statement  : END_E ';'
 		
 statement  : ID '(' ID ')' ';'
 		{
-			printf("\nWe've seen a function\n\n"); 
+
 		}
 		;
 
 statement  :  ID ASG INTLITERAL ';' 
 		{ 
 			printf("\nWe've seen a INT passing\n\n");
-			printf("search:%s\n",new_table->Search_symbol("x")->name);
 			$$ = $1->name;
 			generate_copy($1,$3);
 		}
 	   	|  ID ASG expression ';' 
 		{ 
-			printf("\nWe've seen a expression passing\n\n");
-			$$ = $1->name; 
-			generate_exp($1,$3);
+		printf("\nWe've seen a expression passing\n\n");
+			//$$ = $1->name; 
+			//generate_exp($1,$3);
 		}
   		;
 
@@ -74,7 +73,7 @@ factor 	: factor EXPO parentheses
 		}
 		| parentheses
 		{
-			printf("\nWe've seen a parentheses\n\n"); 
+
 		}
 		| ID
 		{

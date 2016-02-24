@@ -56,10 +56,8 @@ void process_id()
 	   /*  a symbol table entry has a character string "key" taken
                from yytext, and a register "number", in the range 4-31.  */
 
-		new_table -> Insert_symbol(yytext,assign_next_register());
+		t = new_table -> Insert_symbol(yytext,assign_next_register());
 
-
-		printf("search:%s\n",new_table->Search_symbol(yytext)->name);
 	}
 	else
 	{
