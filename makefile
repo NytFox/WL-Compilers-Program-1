@@ -4,7 +4,7 @@ compiler	:gram.o lex.o symtab.o  main.o
 gram.o		: gram.c lex.o symtab.o main.o symtab_class_header.h
 		g++ -c -g gram.c
 
-gram.c		: gram.y
+gram.c		: gram.y symtab_class_header.h 
 		yacc -d gram.y
 		mv y.tab.c gram.c
 

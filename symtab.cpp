@@ -4,14 +4,14 @@
 
 
 Symbol_Table::Symbol_Table(){						
-	current = new Scope;
+	current = new Scope();
 	head = current;
 	level = 1;
 }
 
 Scope* Symbol_Table::Enter_new_scope(){			
 	Scope* new_scope;
-	new_scope = new Scope;
+	new_scope = new Scope();
 	new_scope -> New_upper_scope(current);
 	current = new_scope;
 	level++;
@@ -44,10 +44,17 @@ Symbol* Symbol_Table::Search_symbol(const char* s){
     Scope* tmp;
     tmp=current;
     Symbol* sym;
-    while(tmp->Search_symbol(s)==NULL&&tmp->Return_upper_scope()!=NULL){
+    while((sym=tmp->Search_symbol(s))==NULL&&tmp->Return_upper_scope()!=NULL){
         tmp=tmp->Return_upper_scope();
     }
-    sym = tmp->Search_symbol(s);
+    if(sym)
+    {
+    	cout<<"Symbol name existed"<<endl;
+    }
+    else
+    {
+    	cout<<"Symbol name not existed"<<endl;
+    }
 	return sym;
 }
 
@@ -118,7 +125,6 @@ Symbol* Scope::Search_symbol(const char* s){
     ptr=hashtable[index];
     while(ptr!=NULL){
         if(!strcmp(ptr->Return_name(),s)){
-        	cout<<"Name existed"<<endl;
             return ptr;
         }
         else

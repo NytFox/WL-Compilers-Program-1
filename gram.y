@@ -1,3 +1,37 @@
+%{
+extern "C"
+{
+	int yylex(void);
+	int yyparse(void);
+}
+#include "symtab_class_header.h"
+#include <typeinfo>
+//original
+const char *start_expression_string(Symbol symbol);
+void generate_exp(Symbol *symbol,const char *rhs);
+int yyerror(const char *s);
+void generate_copy(Symbol* symbol,int value);
+
+//new codes
+
+%}
+
+%union 
+{
+        int intstuff;
+        const char *stringstuff;
+        Symbol* symbolstuff;  
+}
+
+%token BEGIN_E
+%token END_E
+%token ASG 
+%token EXPO
+%token <intstuff> INTLITERAL
+%token <symbolstuff> ID
+
+%type <stringstuff> expression 
+%type <stringstuff> statement /* statement_list */
 %start statement_list 
 
 %%

@@ -11,6 +11,7 @@ extern "C"
 
 #include "symtab_class_header.h"
 #include "y.tab.h"
+#include <iostream>
 using namespace std;
 void process_id();
 int assign_next_register();
@@ -26,7 +27,6 @@ end									{ return (END_E);	}
 [ \t\n]+							{ /* delete */		}
 
 {Letter}({Letter}|{Digit}|_)*		{ process_id();
-					  /*printf("after process get id %s\n",yylval.symbolstuff->name);*/
 									  return (ID);		}
 
 {IntLit}							{ yylval.intstuff = atoi(yytext);
@@ -52,21 +52,21 @@ void process_id()
 	    like a character string "key" and an integer "register number."
 	*/
 
-	Symbol* t;
+	Symbol *t;
 	if(!(t = new_table -> Search_symbol(yytext)))
 	{
 	   /*  a symbol table entry has a character string "key" taken
                from yytext, and a register "number", in the range 4-31.  */
-
-		t=new_table -> Insert_symbol(yytext,assign_next_register());
+		cout<<"YYTEXT:"<<yytext<<endl;
+		t = new_table -> Insert_symbol(yytext,assign_next_register());
 
 	}
 	else
 	{
 	    /* the identifier (whose name is stored in yytext) is already
                in the symbol table.  */
+		cout<<"yytext already existed"<<endl;
 	}
-
 	yylval.symbolstuff = t;
         /*printf("in process get id %s\n",yylval.symbolstuff->name);*/
 
