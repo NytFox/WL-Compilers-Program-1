@@ -74,19 +74,18 @@ extern "C"
 	int yyparse(void);
 }
 #include "symtab_class_header.h"
-#include <typeinfo>
 //original
 const char *start_expression_string(Symbol symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
-
-//new codes
-
+char *new_registrator();
+extern int assign_next_register();
+extern char *  itoa ( int value, char * str, int base );
 
 
 /* Line 268 of yacc.c  */
-#line 90 "y.tab.c"
+#line 89 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -137,7 +136,7 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 20 "gram.y"
+#line 19 "gram.y"
 
         int intstuff;
         const char *stringstuff;
@@ -146,7 +145,7 @@ typedef union YYSTYPE
 
 
 /* Line 293 of yacc.c  */
-#line 150 "y.tab.c"
+#line 149 "y.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -158,7 +157,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 162 "y.tab.c"
+#line 161 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -377,14 +376,14 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  10
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   35
+#define YYLAST   33
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  16
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  9
+#define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  20
+#define YYNRULES  18
 /* YYNRULES -- Number of states.  */
 #define YYNSTATES  35
 
@@ -433,8 +432,7 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     6,     8,    11,    14,    20,    25,    29,
-      31,    35,    37,    41,    43,    45,    47,    51,    53,    55,
-      57
+      33,    35,    39,    43,    45,    49,    51,    53,    55
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
@@ -442,18 +440,17 @@ static const yytype_int8 yyrhs[] =
 {
       17,     0,    -1,    17,    18,    -1,    18,    -1,     3,     9,
       -1,     4,     9,    -1,     8,    10,     8,    11,     9,    -1,
-       8,     5,    19,     9,    -1,    19,    23,    20,    -1,    20,
-      -1,    20,    24,    21,    -1,    21,    -1,    21,     6,    22,
-      -1,    22,    -1,     8,    -1,     7,    -1,    10,    19,    11,
-      -1,    12,    -1,    13,    -1,    14,    -1,    15,    -1
+       8,     5,    19,     9,    -1,    19,    12,    20,    -1,    19,
+      13,    20,    -1,    20,    -1,    20,    14,    21,    -1,    20,
+      15,    21,    -1,    21,    -1,    21,     6,    22,    -1,    22,
+      -1,     8,    -1,     7,    -1,    10,    19,    11,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    38,    38,    39,    42,    48,    54,    60,    68,    72,
-      78,    82,    88,    92,    96,   101,   109,   116,   117,   120,
-     121
+       0,    40,    40,    41,    44,    51,    58,    64,    73,    81,
+      89,    95,   102,   109,   115,   119,   123,   128,   137
 };
 #endif
 
@@ -465,7 +462,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "BEGIN_E", "END_E", "ASG", "EXPO",
   "INTLITERAL", "ID", "';'", "'('", "')'", "'+'", "'-'", "'*'", "'/'",
   "$accept", "statement_list", "statement", "expression", "term", "factor",
-  "parentheses", "add_op", "mul_op", 0
+  "parentheses", 0
 };
 #endif
 
@@ -483,16 +480,14 @@ static const yytype_uint16 yytoknum[] =
 static const yytype_uint8 yyr1[] =
 {
        0,    16,    17,    17,    18,    18,    18,    18,    19,    19,
-      20,    20,    21,    21,    21,    21,    22,    23,    23,    24,
-      24
+      19,    20,    20,    20,    21,    21,    21,    21,    22
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     1,     2,     2,     5,     4,     3,     1,
-       3,     1,     3,     1,     1,     1,     3,     1,     1,     1,
-       1
+       0,     2,     2,     1,     2,     2,     5,     4,     3,     3,
+       1,     3,     3,     1,     3,     1,     1,     1,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
@@ -501,15 +496,15 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        0,     0,     0,     0,     0,     3,     4,     5,     0,     0,
-       1,     2,    15,    14,     0,     0,     9,    11,    13,     0,
-       0,     7,    17,    18,     0,    19,    20,     0,     0,     0,
-      16,     8,    10,    12,     6
+       1,     2,    17,    16,     0,     0,    10,    13,    15,     0,
+       0,     7,     0,     0,     0,     0,     0,     0,    18,     8,
+       9,    11,    12,    14,     6
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5,    15,    16,    17,    18,    24,    27
+      -1,     4,     5,    15,    16,    17,    18
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
@@ -518,15 +513,15 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_int8 yypact[] =
 {
       -2,    -4,    14,     2,     0,    -5,    -5,    -5,     8,     3,
-      -5,    -5,    -5,    -5,     8,     1,    10,    11,    -5,    15,
-       9,    -5,    -5,    -5,     8,    -5,    -5,     8,    -1,    18,
-      -5,    10,    11,    -5,    -5
+      -5,    -5,    -5,    -5,     8,     1,    10,    11,    -5,    17,
+       9,    -5,     8,     8,     8,     8,    -1,    22,    -5,    10,
+      10,    11,    11,    -5,    -5
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -5,    -5,    24,     5,     6,     4,     7,    -5,    -5
+      -5,    -5,    15,    18,     4,     5,     7
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -536,9 +531,9 @@ static const yytype_int8 yypgoto[] =
 static const yytype_uint8 yytable[] =
 {
       10,     1,     2,     1,     2,     6,     3,     8,     3,    14,
-      21,    19,     9,    22,    23,    12,    13,    28,    14,    20,
-      30,    22,    23,     7,    25,    26,    29,    34,    11,     0,
-      31,    32,     0,     0,     0,    33
+      21,    19,     9,    22,    23,    12,    13,    26,    14,    11,
+      28,    22,    23,     7,    24,    25,    29,    30,    27,    31,
+      32,    34,    20,    33
 };
 
 #define yypact_value_is_default(yystate) \
@@ -547,12 +542,12 @@ static const yytype_uint8 yytable[] =
 #define yytable_value_is_error(yytable_value) \
   YYID (0)
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
        0,     3,     4,     3,     4,     9,     8,     5,     8,    10,
-       9,     8,    10,    12,    13,     7,     8,     6,    10,    14,
-      11,    12,    13,     9,    14,    15,    11,     9,     4,    -1,
-      24,    27,    -1,    -1,    -1,    28
+       9,     8,    10,    12,    13,     7,     8,     6,    10,     4,
+      11,    12,    13,     9,    14,    15,    22,    23,    11,    24,
+      25,     9,    14,    26
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -561,8 +556,8 @@ static const yytype_uint8 yystos[] =
 {
        0,     3,     4,     8,    17,    18,     9,     9,     5,    10,
        0,    18,     7,     8,    10,    19,    20,    21,    22,     8,
-      19,     9,    12,    13,    23,    14,    15,    24,     6,    11,
-      11,    20,    21,    22,     9
+      19,     9,    12,    13,    14,    15,     6,    11,    11,    20,
+      20,    21,    21,    22,     9
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1399,120 +1394,156 @@ yyreduce:
         case 4:
 
 /* Line 1806 of yacc.c  */
-#line 43 "gram.y"
+#line 45 "gram.y"
     {
-			printf("\nSeen: BEGIN\n\n");
+			printf("\nSeen BEGIN\n\n");
+			output_file << "int r0, r1, r2, r3, r4, r5, r6, r7;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n\nmain{\n"<<endl;
 		}
     break;
 
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 49 "gram.y"
+#line 52 "gram.y"
     {
-			printf("\nSeen: END;\n\n"); 
+			printf("\nSeen END;\n\n"); 
+			output_file << "}\n"<<endl;
 		}
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 55 "gram.y"
+#line 59 "gram.y"
     {
-			printf("\nSeen: FUNCTION\n\n"); 
+			printf("\nSeen FUNCTION\n\n"); 
 		}
     break;
 
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 61 "gram.y"
+#line 65 "gram.y"
     { 
-			printf("\nSeen: EXP PASSING\n\n");
+			printf("\nSeen EXP PASSING\n\n");
+			char *rd = start_expression_string((yyvsp[(1) - (4)].symbolstuff));
+		    cout<< rd <<" = " << (yyvsp[(3) - (4)].stringstuff)<<endl;
 
-			cout<<(yyvsp[(1) - (4)].symbolstuff)->name<<endl;
 		}
     break;
 
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 69 "gram.y"
+#line 74 "gram.y"
     {
-		    printf("\nSeen: ADD_OP\n\n"); 
+		    printf("\nSeen ADD_OP\n\n"); 
+		    char *rd = new_registrator();
+		    cout<< rd <<" = " << (yyvsp[(1) - (3)].stringstuff) << " + "<< (yyvsp[(3) - (3)].stringstuff)<<endl;
+		    (yyval.stringstuff) = rd;
+
 		}
     break;
 
   case 9:
 
 /* Line 1806 of yacc.c  */
-#line 73 "gram.y"
-    { 
-		    printf("Seen: Term \n"); 
+#line 82 "gram.y"
+    {
+		    printf("\nSeen ADD_OP\n\n"); 
+		   char *rd = new_registrator();
+		    cout<< rd <<" = " << (yyvsp[(1) - (3)].stringstuff) << " - "<< (yyvsp[(3) - (3)].stringstuff)<<endl;
+		    (yyval.stringstuff) = rd;
+		    
 		}
     break;
 
   case 10:
 
 /* Line 1806 of yacc.c  */
-#line 79 "gram.y"
-    {
-		    printf("\nSeen: MUL_OP \n\n"); 
+#line 90 "gram.y"
+    { 
+		    printf("Seen Term \n"); 
 		}
     break;
 
   case 11:
 
 /* Line 1806 of yacc.c  */
-#line 83 "gram.y"
-    { 
-		    printf("Seen: FACTOR \n"); 
+#line 96 "gram.y"
+    {
+		    printf("\nSeen MUL_OP \n\n"); 
+		    char *rd = new_registrator();
+		    cout<< rd <<" = " << (yyvsp[(1) - (3)].stringstuff) << " * "<< (yyvsp[(3) - (3)].stringstuff)<<endl;
+		    (yyval.stringstuff) = rd;
 		}
     break;
 
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 89 "gram.y"
+#line 103 "gram.y"
     {
-			printf("Seen: EXPO_OP\n"); 
+		    printf("\nSeen MUL_OP \n\n"); 
+		    char *rd = new_registrator();
+		    cout<< rd <<" = " << (yyvsp[(1) - (3)].stringstuff) << " / "<< (yyvsp[(3) - (3)].stringstuff)<<endl;
+		    (yyval.stringstuff) = rd;
 		}
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 93 "gram.y"
-    {
-			printf("\nSeen: PARENTHESES\n\n"); 
+#line 110 "gram.y"
+    { 
+		    printf("Seen: FACTOR \n"); 
 		}
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 97 "gram.y"
+#line 116 "gram.y"
     {
-			printf("\nSeen: ID\n\n"); 
-			cout<<(yyvsp[(1) - (1)].symbolstuff)->name<<endl;
+			printf("Seen: EXPO_OP\n"); 
 		}
     break;
 
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 102 "gram.y"
+#line 120 "gram.y"
     {
-			printf("\nSeen: INTLITERAL\n\n"); 
-			new_table -> Search_symbol("x");
-			cout<<(yyvsp[(1) - (1)].intstuff)<<endl;
+			printf("\nSeen: PARENTHESES\n\n"); 
 		}
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 110 "gram.y"
+#line 124 "gram.y"
+    {
+			cout<<"Seen ID->"<<(yyvsp[(1) - (1)].symbolstuff)->name<<endl;
+			(yyval.stringstuff) = start_expression_string((yyvsp[(1) - (1)].symbolstuff));
+		}
+    break;
+
+  case 17:
+
+/* Line 1806 of yacc.c  */
+#line 129 "gram.y"
+    {
+			cout<<"Seen INTLITERAL->"<<(yyvsp[(1) - (1)].intstuff)<<endl;
+			char buffer[4];
+			itoa((yyvsp[(1) - (1)].intstuff),buffer,10);
+			(yyval.stringstuff) = buffer;
+		}
+    break;
+
+  case 18:
+
+/* Line 1806 of yacc.c  */
+#line 138 "gram.y"
     {
 
 		}
@@ -1521,7 +1552,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 1525 "y.tab.c"
+#line 1556 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1752,7 +1783,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 124 "gram.y"
+#line 143 "gram.y"
 
 
 void Generate_value_passing(Symbol* symbol,int value)
@@ -1785,7 +1816,7 @@ void generate_exp(Symbol *symbol,const char *rhs)
 }
 
 
-char *start_expression_string(Symbol *symbol)
+char *start_expression_string(Symbol* symbol)
 {
 	char buffer[10];
 	char *result;
@@ -1797,12 +1828,23 @@ char *start_expression_string(Symbol *symbol)
 
 	return result;
 }
-	
+
+char *new_registrator()
+{
+	char buffer[10];
+	char *result;
+	result = (char *)malloc(4);  /*  tacky, but should be big enuff  */
+
+	strcpy(result,"r");
+	sprintf(buffer,"%d",assign_next_register());
+	strcat(result,buffer);
+	return result;
+}
+
 int yyerror(const char *s)
 {
         fflush(stdout);
         printf("Syntax Error %s\n",s);
         return 0;
 }
-
 

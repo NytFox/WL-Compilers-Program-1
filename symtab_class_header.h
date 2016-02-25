@@ -4,10 +4,12 @@
 #define HT_SIZE 1024
 #include <iostream>
 using namespace std;
+#include <string>
+#include <cstring>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fstream>
 extern int const_value;						// Hashtable size
 class Symbol {							// Symbol node in the hash table
 public:
@@ -20,7 +22,7 @@ public:
 	const char* Return_name();
 
 public:
-	const char* name;							// pointer of the variable
+	char* name;							// pointer of the variable
 	Symbol* next_bucket;				// next collinsion variable
 	int offset;
 	/*
@@ -70,4 +72,5 @@ public:
 };
 
 extern Symbol_Table* new_table;
+extern ofstream output_file;
 #endif

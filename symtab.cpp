@@ -1,5 +1,3 @@
-#include <iostream>
-#include <cstring>
 #include "symtab_class_header.h"
 
 
@@ -28,6 +26,7 @@ Scope* Symbol_Table::Leave_current_scope(){
 }
 
 Symbol* Symbol_Table::Insert_symbol(const char* s,const char* type,const char* value, int offset){
+
 	Symbol* sym;
 	sym = current->Insert_symbol(s,type,value, offset);
 	return sym;
@@ -148,10 +147,12 @@ unsigned int Scope::Count_table_symbols(){
 Symbol::Symbol(const char *s){
     type=NULL;
     value=NULL;
-    name=s;
+    name = new char[strlen(s)+1];
+    strcpy(name,s);
     next_bucket=NULL;
     offset = -1;
 }
+
 Symbol* Symbol::Give_attributes(const char* t,const char* v, int offset){
     type=t;
     value=v;

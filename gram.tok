@@ -5,15 +5,14 @@ extern "C"
 	int yyparse(void);
 }
 #include "symtab_class_header.h"
-#include <typeinfo>
 //original
 const char *start_expression_string(Symbol symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
-
-//new codes
-
+char *new_registrator();
+extern int assign_next_register();
+extern char *  itoa ( int value, char * str, int base );
 %}
 
 %union 
@@ -30,5 +29,8 @@ void generate_copy(Symbol* symbol,int value);
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
 
+%type <stringstuff> factor 
+%type <stringstuff> term
 %type <stringstuff> expression 
-%type <stringstuff> statement /* statement_list */
+%type <stringstuff> statement
+

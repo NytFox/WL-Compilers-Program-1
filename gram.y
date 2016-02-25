@@ -11,7 +11,8 @@ const char *start_expression_string(Symbol symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
-
+extern int assign_next_register();
+char *new_registrator();
 //new codes
 
 %}
@@ -31,7 +32,9 @@ void generate_copy(Symbol* symbol,int value);
 %token <symbolstuff> ID
 
 %type <stringstuff> expression 
-%type <stringstuff> statement /* statement_list */
+%type <stringstuff> statement
+%type <stringstuff> term 
+%type <stringstuff> factor
 %start statement_list 
 
 %%
@@ -41,46 +44,67 @@ statement_list  :  statement_list statement
 
 statement  : BEGIN_E ';'
 		{
-			printf("\nSeen: BEGIN\n\n");
+			printf("\nSeen BEGIN\n\n");
+			output_file << "int r0, r1, r2, r3, r4, r5, r6, r7;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n\nmain{\n"<<endl;
 		}
 		;
 
 statement  : END_E ';'
 		{
-			printf("\nSeen: END;\n\n"); 
+			printf("\nSeen END;\n\n"); 
+			output_file << "}\n"<<endl;
 		}
 		;
 		
 statement  : ID '(' ID ')' ';'
 		{
-			printf("\nSeen: FUNCTION\n\n"); 
+			printf("\nSeen FUNCTION\n\n"); 
 		}
 		;
 
 statement  : ID ASG expression ';' 
 		{ 
-			printf("\nSeen: EXP PASSING\n\n");
-			Symbol *tmp1;
-			tmp1 = $1;
-			Symbol *tmp2;
-			tmp2 = new_table -> Search_symbol("x");
-			cout<<$1->name<<endl;
+			printf("\nSeen EXP PASSING\n\n");
+			char *rd = new_registrator();
+		    cout<< rd <<" = " << expression<<endl;
 		}
   		;
 
-expression : expression add_op term
+expression : expression '+' term
 		{
-		    printf("\nSeen: ADD_OP\n\n"); 
+		    printf("\nSeen ADD_OP\n\n"); 
+		    char *rd = new_registrator();
+		    cout<< rd <<" = " << expression << " + "<< term<<endl;
+		    $$ = rd;
+
+		}
+		| expression '-' term
+		{
+		    printf("\nSeen ADD_OP\n\n"); 
+		   char *rd = new_registrator();
+		    cout<< rd <<" = " << expression << " - "<< term<<endl;
+		    $$ = rd;
+		    
 		}
 	    | term
 		{ 
-		    printf("Seen: Term \n"); 
+		    printf("Seen Term \n"); 
 		}
    		;
 
-term : term mul_op factor 
+term : 	term '*' factor 
 		{
-		    printf("\nSeen: MUL_OP \n\n"); 
+		    printf("\nSeen MUL_OP \n\n"); 
+		    char *rd = new_registrator();
+		    cout<< rd <<" = " << term << " * "<< factor<<endl;
+		    $$ = rd;
+		}
+		| term '/' factor 
+		{
+		    printf("\nSeen MUL_OP \n\n"); 
+		    char *rd = new_registrator();
+		    cout<< rd <<" = " << term << " / "<< factor<<endl;
+		    $$ = rd;
 		}
 	   	| factor
 		{ 
@@ -98,13 +122,13 @@ factor 	: factor EXPO parentheses
 		}
 		| ID
 		{
-			printf("\nSeen: ID\n\n"); 
-			cout<<$1->name<<endl;
+			cout<<"Seen ID->"<<$1->name<<endl;
+			$$ = start_expression_string($1);
 		}
 		| INTLITERAL
 		{
-			printf("\nSeen: INTLITERAL\n\n"); 
-			cout<<$1<<endl;
+			cout<<"Seen INTLITERAL->"<<$1<<endl;
+			$$ = $1;
 		}
 		;
 
@@ -112,15 +136,6 @@ parentheses : '(' expression ')'
 		{
 
 		}
-		;
-
-
-add_op 	: '+'
-		| '-'
-   		;
-
-mul_op	: '*'
-		| '/'
 		;
 
 %%
@@ -167,11 +182,25 @@ char *start_expression_string(Symbol *symbol)
 
 	return result;
 }
-	
+
+char *new_registrator()
+{
+	char buffer[10];
+	char *result;
+	result = (char *)malloc(4);  /*  tacky, but should be big enuff  */
+
+	strcpy(result,"r");
+	sprintf(buffer,"%d",assign_next_register());
+	strcat(result,buffer);
+	return result;
+}
+
 int yyerror(const char *s)
 {
         fflush(stdout);
         printf("Syntax Error %s\n",s);
         return 0;
 }
+
+int 
 

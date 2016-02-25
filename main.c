@@ -7,7 +7,7 @@ extern "C"
 /*  global variable(s), used in the compiler  */
 int const_value;
 Symbol_Table *new_table;
-
+ofstream output_file;
 int main()
 {
 	
@@ -20,17 +20,9 @@ int main()
 
 	/*  yyparse is the name of the parser.  It parses the program, and
             allows us to spit out code during the parse.  */
-    ofstream output_file;
     output_file.open("CM_code.cm");
-    cout << "int r0, r1, r2, r3, r4, r5, r6, r7;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n\nmain()\n{\n"<<endl;
-    output_file << "int r0, r1, r2, r3, r4, r5, r6, r7;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n\nmain()\n{\n"<<endl;
+
     yyparse();
-    cout << "}\n"<<endl;
-    output_file << "}\n"<<endl;
-    new_table -> Search_symbol("x");
-
-
-
 
 
     output_file.close();
