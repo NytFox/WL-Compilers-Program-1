@@ -6,13 +6,15 @@ extern "C"
 }
 #include "symtab_class_header.h"
 //original
-const char *start_expression_string(Symbol symbol);
+char *start_expression_string(Symbol *symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
 char *new_registrator();
+void function_call(Symbol *func, Symbol *para);
+char *Calc_exponential(const char *r1,const char *r2);
+int assign_next_lable();
 extern int assign_next_register();
-extern char *  itoa ( int value, char * str, int base );
 %}
 
 %union 
@@ -33,4 +35,5 @@ extern char *  itoa ( int value, char * str, int base );
 %type <stringstuff> term
 %type <stringstuff> expression 
 %type <stringstuff> statement
+%type <stringstuff> parentheses
 

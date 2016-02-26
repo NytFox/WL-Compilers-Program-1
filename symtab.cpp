@@ -48,11 +48,11 @@ Symbol* Symbol_Table::Search_symbol(const char* s){
     }
     if(sym)
     {
-    	cout<<"Symbol name existed"<<endl;
+    	// cout<<"Symbol name existed"<<endl;
     }
     else
     {
-    	cout<<"Symbol name not existed"<<endl;
+    	// cout<<"Symbol name not existed"<<endl;
     }
 	return sym;
 }

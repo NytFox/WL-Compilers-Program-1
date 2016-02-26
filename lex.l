@@ -57,7 +57,7 @@ void process_id()
 	{
 	   /*  a symbol table entry has a character string "key" taken
                from yytext, and a register "number", in the range 4-31.  */
-		cout<<"YYTEXT:"<<yytext<<endl;
+		// cout<<"YYTEXT:"<<yytext<<endl;
 		t = new_table -> Insert_symbol(yytext,assign_next_register());
 
 	}
@@ -65,7 +65,7 @@ void process_id()
 	{
 	    /* the identifier (whose name is stored in yytext) is already
                in the symbol table.  */
-		cout<<"yytext already existed"<<endl;
+		// cout<<"yytext already existed"<<endl;
 	}
 	yylval.symbolstuff = t;
         /*printf("in process get id %s\n",yylval.symbolstuff->name);*/
@@ -81,5 +81,5 @@ int assign_next_register()
 
 	static int register_number;
 	register_number = (register_number + 1) % 28;
-	return register_number + 4;
+	return register_number;
 }

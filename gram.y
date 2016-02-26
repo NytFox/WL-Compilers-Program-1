@@ -5,16 +5,14 @@ extern "C"
 	int yyparse(void);
 }
 #include "symtab_class_header.h"
-#include <typeinfo>
 //original
 const char *start_expression_string(Symbol symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
-extern int assign_next_register();
 char *new_registrator();
-//new codes
-
+extern int assign_next_register();
+extern char *  itoa ( int value, char * str, int base );
 %}
 
 %union 
@@ -31,10 +29,11 @@ char *new_registrator();
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
 
+%type <stringstuff> factor 
+%type <stringstuff> term
 %type <stringstuff> expression 
 %type <stringstuff> statement
-%type <stringstuff> term 
-%type <stringstuff> factor
+
 %start statement_list 
 
 %%
@@ -65,8 +64,9 @@ statement  : ID '(' ID ')' ';'
 statement  : ID ASG expression ';' 
 		{ 
 			printf("\nSeen EXP PASSING\n\n");
-			char *rd = new_registrator();
-		    cout<< rd <<" = " << expression<<endl;
+			//char *rd = start_expression_string($1);
+		    cout<< rd <<" = " << $3<<endl;
+
 		}
   		;
 
@@ -74,7 +74,7 @@ expression : expression '+' term
 		{
 		    printf("\nSeen ADD_OP\n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << expression << " + "<< term<<endl;
+		    cout<< rd <<" = " << $1 << " + "<< $3<<endl;
 		    $$ = rd;
 
 		}
@@ -82,7 +82,7 @@ expression : expression '+' term
 		{
 		    printf("\nSeen ADD_OP\n\n"); 
 		   char *rd = new_registrator();
-		    cout<< rd <<" = " << expression << " - "<< term<<endl;
+		    cout<< rd <<" = " << $1 << " - "<< $3<<endl;
 		    $$ = rd;
 		    
 		}
@@ -96,14 +96,14 @@ term : 	term '*' factor
 		{
 		    printf("\nSeen MUL_OP \n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << term << " * "<< factor<<endl;
+		    cout<< rd <<" = " << $1 << " * "<< $3<<endl;
 		    $$ = rd;
 		}
 		| term '/' factor 
 		{
 		    printf("\nSeen MUL_OP \n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << term << " / "<< factor<<endl;
+		    cout<< rd <<" = " << $1 << " / "<< $3<<endl;
 		    $$ = rd;
 		}
 	   	| factor
@@ -123,12 +123,14 @@ factor 	: factor EXPO parentheses
 		| ID
 		{
 			cout<<"Seen ID->"<<$1->name<<endl;
-			$$ = start_expression_string($1);
+			//$$ = start_expression_string($1->offset);
 		}
 		| INTLITERAL
 		{
 			cout<<"Seen INTLITERAL->"<<$1<<endl;
-			$$ = $1;
+			char buffer[4];
+			itoa($1,buffer,10);
+			$$ = buffer;
 		}
 		;
 
@@ -170,14 +172,14 @@ void generate_exp(Symbol *symbol,const char *rhs)
 }
 
 
-char *start_expression_string(Symbol *symbol)
+char *start_expression_string(int offset)
 {
 	char buffer[10];
 	char *result;
 	result = (char *)malloc(4);  /*  tacky, but should be big enuff  */
 
 	strcpy(result,"r");
-	sprintf(buffer,"%d",symbol->offset);
+	sprintf(buffer,"%d",offset);
 	strcat(result,buffer);
 
 	return result;
@@ -201,6 +203,3 @@ int yyerror(const char *s)
         printf("Syntax Error %s\n",s);
         return 0;
 }
-
-int 
-
