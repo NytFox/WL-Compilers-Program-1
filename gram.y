@@ -1,3 +1,44 @@
+%{
+extern "C"
+{
+	int yylex(void);
+	int yyparse(void);
+}
+#include "symtab_class_header.h"
+//original
+char *start_expression_string(Symbol *symbol);
+void generate_exp(Symbol *symbol,const char *rhs);
+int yyerror(const char *s);
+void generate_copy(Symbol* symbol,int value);
+char *new_registrator();
+void function_call(Symbol *func, Symbol *para);
+char *Calc_exponential(const char *r1,const char *r2);
+int assign_next_lable();
+char *get_number(int num);
+void cal_operation(char oprator,const char *left, const char *right);
+extern int assign_next_register();
+%}
+
+%union 
+{
+        int intstuff;
+        const char *stringstuff;
+        Symbol* symbolstuff;  
+}
+
+%token BEGIN_E
+%token END_E
+%token ASG 
+%token EXPO
+%token <intstuff> INTLITERAL
+%token <symbolstuff> ID
+
+%type <stringstuff> factor 
+%type <stringstuff> term
+%type <stringstuff> expression 
+%type <stringstuff> statement
+%type <stringstuff> parentheses
+
 %start statement_list 
 
 %%
@@ -217,29 +258,16 @@ char *get_number(int num)
 	return buffer;
 }
 
-bool is_number(const char *string)
-{
-	bool result = 0;
-	for(int i=0;i<strlen(string);i++)
-	{
-		result = isdigit(string[i]);
-		if(!result)
-			return 0;
-	}
-	return 1;
-}
 
 void cal_operation(char oprator,const char *left, const char *right)
 {
 	int temp;
 	int a,b;
-	if(is_number(left)&&is_number(right))
+	if(atoi(left)&&atoi(right))
 	{
-		//cout<< "T1"<<endl;
 		a = atoi(left);
 		b = atoi(right);
-
-		switch(oprator)
+		switch(*oprator)
 		{
 			case '+':{
 				cout<<a+b;
@@ -262,7 +290,6 @@ void cal_operation(char oprator,const char *left, const char *right)
 	}
 	else
 	{
-		//cout<< "T2"<<endl;
 		switch(oprator)
 		{
 			case '+':{
@@ -284,7 +311,7 @@ void cal_operation(char oprator,const char *left, const char *right)
 			default: break;
 		}
 	}
-	cout<<";"<<endl;
+	cout<<";"<<end;
 }
 
 

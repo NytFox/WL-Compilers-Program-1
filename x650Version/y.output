@@ -1,0 +1,1605 @@
+Terminals unused in grammar
+
+   FLOAT
+   DOUBLE
+   C_REGISTER
+   F_REGISTER
+   D_REGISTER
+   PUSHF
+   PUSHD
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: globals function_list
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    4 staticData: staticDecl
+    5           | staticDecl staticData
+
+    6 staticDecl: CHAR ID LBRACKET INTLITERAL RBRACKET ';'
+
+    7 pointerDecls: INT iptrDecls ';' CHAR cptrDecls
+
+    8 iptrDecls: '*' IPTR
+    9          | '*' IPTR ',' iptrDecls
+
+   10 cptrDecls: '*' CPTR
+   11          | '*' CPTR ',' cptrDecls
+
+   12 intDeclaration: I_REGISTER
+   13               | I_REGISTER ',' intDeclaration
+
+   14 register: I_REGISTER
+
+   15 parameterList: register
+   16              | IPTR
+   17              | register ',' parameterList
+   18              | IPTR ',' parameterList
+
+   19 function_list: function
+   20              | function_list function
+
+   21 function: ID LPAREN RPAREN LCURLY statement_list RCURLY
+   22         | ID LPAREN parameterList RPAREN LCURLY statement_list RCURLY
+
+   23 statement_list: statement
+   24               | statement_list statement
+
+   25 statement: register '=' register op register ';'
+   26          | register '=' register op INTLITERAL ';'
+   27          | register '=' INTLITERAL op register ';'
+   28          | register '=' register ';'
+   29          | register '=' deref ';'
+   30          | register '=' INTLITERAL ';'
+   31          | deref '=' register ';'
+   32          | PUSHI LPAREN I_REGISTER RPAREN ';'
+   33          | PUSHC LPAREN I_REGISTER RPAREN ';'
+   34          | ID LPAREN RPAREN ';'
+   35          | ID LPAREN parameterList RPAREN ';'
+   36          | IPTR '=' ID LPAREN register RPAREN ';'
+   37          | IPTR '=' '&' register ';'
+   38          | CPTR '=' ID LPAREN register RPAREN ';'
+   39          | ID LPAREN STRING_LITERAL RPAREN ';'
+   40          | LABEL
+   41          | GOTO ID ';'
+   42          | RETURN ';'
+   43          | IF LPAREN register relop register RPAREN GOTO ID ';'
+
+   44 deref: '*' LPAREN FRAMEPTR '+' INTLITERAL RPAREN
+   45      | '*' IPTR
+   46      | '*' CPTR
+   47      | '*' LPAREN ID '+' INTLITERAL RPAREN
+
+   48 op: '*'
+   49   | '+'
+   50   | '-'
+   51   | '/'
+   52   | '%'
+   53   | '<' '<'
+   54   | '>' '>'
+   55   | '&'
+   56   | '|'
+   57   | '^'
+   58   | '~'
+
+   59 relop: '>'
+   60      | '<'
+   61      | '=' '='
+   62      | '!' '='
+   63      | '>' '='
+   64      | '<' '='
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 62
+'%' (37) 52
+'&' (38) 37 55
+'*' (42) 2 3 8 9 10 11 44 45 46 47 48
+'+' (43) 44 47 49
+',' (44) 2 3 9 11 13 17 18
+'-' (45) 50
+'/' (47) 51
+';' (59) 2 3 6 7 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 41 42
+    43
+'<' (60) 53 60 64
+'=' (61) 25 26 27 28 29 30 31 36 37 38 61 62 63 64
+'>' (62) 54 59 63
+'^' (94) 57
+'|' (124) 56
+'~' (126) 58
+error (256)
+ID (258) 6 21 22 34 35 36 38 39 41 43 47
+IF (259) 43
+INT (260) 2 3 7
+FLOAT (261)
+DOUBLE (262)
+CHAR (263) 2 3 6 7
+STRING_LITERAL (264) 39
+INTLITERAL (265) 6 26 27 30 44 47
+C_REGISTER (266)
+I_REGISTER (267) 12 13 14 32 33
+F_REGISTER (268)
+D_REGISTER (269)
+IPTR (270) 8 9 16 18 36 37 45
+CPTR (271) 10 11 38 46
+PUSHC (272) 33
+PUSHI (273) 32
+PUSHF (274)
+PUSHD (275)
+FRAMEPTR (276) 2 3 44
+STACKPTR (277) 2 3
+LBRACKET (278) 6
+RBRACKET (279) 6
+LPAREN (280) 21 22 32 33 34 35 36 38 39 43 44 47
+RPAREN (281) 21 22 32 33 34 35 36 38 39 43 44 47
+RCURLY (282) 21 22
+LCURLY (283) 21 22
+GOTO (284) 41 43
+RETURN (285) 42
+LABEL (286) 40
+
+
+Nonterminals, with rules where they appear
+
+$accept (47)
+    on left: 0
+program (48)
+    on left: 1, on right: 0
+globals (49)
+    on left: 2 3, on right: 1
+staticData (50)
+    on left: 4 5, on right: 3 5
+staticDecl (51)
+    on left: 6, on right: 4 5
+pointerDecls (52)
+    on left: 7, on right: 2 3
+iptrDecls (53)
+    on left: 8 9, on right: 7 9
+cptrDecls (54)
+    on left: 10 11, on right: 7 11
+intDeclaration (55)
+    on left: 12 13, on right: 2 3 13
+register (56)
+    on left: 14, on right: 15 17 25 26 27 28 29 30 31 36 37 38 43
+parameterList (57)
+    on left: 15 16 17 18, on right: 17 18 22 35
+function_list (58)
+    on left: 19 20, on right: 1 20
+function (59)
+    on left: 21 22, on right: 19 20
+statement_list (60)
+    on left: 23 24, on right: 21 22 24
+statement (61)
+    on left: 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42
+    43, on right: 23 24
+deref (62)
+    on left: 44 45 46 47, on right: 29 31
+op (63)
+    on left: 48 49 50 51 52 53 54 55 56 57 58, on right: 25 26 27
+relop (64)
+    on left: 59 60 61 62 63 64, on right: 43
+
+
+state 0
+
+    0 $accept: . program $end
+
+    INT  shift, and go to state 1
+
+    program  go to state 2
+    globals  go to state 3
+
+
+state 1
+
+    2 globals: INT . intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT . intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    I_REGISTER  shift, and go to state 4
+
+    intDeclaration  go to state 5
+
+
+state 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 6
+
+
+state 3
+
+    1 program: globals . function_list
+
+    ID  shift, and go to state 7
+
+    function_list  go to state 8
+    function       go to state 9
+
+
+state 4
+
+   12 intDeclaration: I_REGISTER .
+   13               | I_REGISTER . ',' intDeclaration
+
+    ','  shift, and go to state 10
+
+    $default  reduce using rule 12 (intDeclaration)
+
+
+state 5
+
+    2 globals: INT intDeclaration . ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration . ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    ';'  shift, and go to state 11
+
+
+state 6
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 7
+
+   21 function: ID . LPAREN RPAREN LCURLY statement_list RCURLY
+   22         | ID . LPAREN parameterList RPAREN LCURLY statement_list RCURLY
+
+    LPAREN  shift, and go to state 12
+
+
+state 8
+
+    1 program: globals function_list .
+   20 function_list: function_list . function
+
+    ID  shift, and go to state 7
+
+    $default  reduce using rule 1 (program)
+
+    function  go to state 13
+
+
+state 9
+
+   19 function_list: function .
+
+    $default  reduce using rule 19 (function_list)
+
+
+state 10
+
+   13 intDeclaration: I_REGISTER ',' . intDeclaration
+
+    I_REGISTER  shift, and go to state 4
+
+    intDeclaration  go to state 14
+
+
+state 11
+
+    2 globals: INT intDeclaration ';' . pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' . pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    INT  shift, and go to state 15
+
+    pointerDecls  go to state 16
+
+
+state 12
+
+   21 function: ID LPAREN . RPAREN LCURLY statement_list RCURLY
+   22         | ID LPAREN . parameterList RPAREN LCURLY statement_list RCURLY
+
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 18
+    RPAREN      shift, and go to state 19
+
+    register       go to state 20
+    parameterList  go to state 21
+
+
+state 13
+
+   20 function_list: function_list function .
+
+    $default  reduce using rule 20 (function_list)
+
+
+state 14
+
+   13 intDeclaration: I_REGISTER ',' intDeclaration .
+
+    $default  reduce using rule 13 (intDeclaration)
+
+
+state 15
+
+    7 pointerDecls: INT . iptrDecls ';' CHAR cptrDecls
+
+    '*'  shift, and go to state 22
+
+    iptrDecls  go to state 23
+
+
+state 16
+
+    2 globals: INT intDeclaration ';' pointerDecls . ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls . ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    ';'  shift, and go to state 24
+
+
+state 17
+
+   14 register: I_REGISTER .
+
+    $default  reduce using rule 14 (register)
+
+
+state 18
+
+   16 parameterList: IPTR .
+   18              | IPTR . ',' parameterList
+
+    ','  shift, and go to state 25
+
+    $default  reduce using rule 16 (parameterList)
+
+
+state 19
+
+   21 function: ID LPAREN RPAREN . LCURLY statement_list RCURLY
+
+    LCURLY  shift, and go to state 26
+
+
+state 20
+
+   15 parameterList: register .
+   17              | register . ',' parameterList
+
+    ','  shift, and go to state 27
+
+    $default  reduce using rule 15 (parameterList)
+
+
+state 21
+
+   22 function: ID LPAREN parameterList . RPAREN LCURLY statement_list RCURLY
+
+    RPAREN  shift, and go to state 28
+
+
+state 22
+
+    8 iptrDecls: '*' . IPTR
+    9          | '*' . IPTR ',' iptrDecls
+
+    IPTR  shift, and go to state 29
+
+
+state 23
+
+    7 pointerDecls: INT iptrDecls . ';' CHAR cptrDecls
+
+    ';'  shift, and go to state 30
+
+
+state 24
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' . CHAR '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' . CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    CHAR  shift, and go to state 31
+
+
+state 25
+
+   18 parameterList: IPTR ',' . parameterList
+
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 18
+
+    register       go to state 20
+    parameterList  go to state 32
+
+
+state 26
+
+   21 function: ID LPAREN RPAREN LCURLY . statement_list RCURLY
+
+    ID          shift, and go to state 33
+    IF          shift, and go to state 34
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 35
+    CPTR        shift, and go to state 36
+    PUSHC       shift, and go to state 37
+    PUSHI       shift, and go to state 38
+    GOTO        shift, and go to state 39
+    RETURN      shift, and go to state 40
+    LABEL       shift, and go to state 41
+    '*'         shift, and go to state 42
+
+    register        go to state 43
+    statement_list  go to state 44
+    statement       go to state 45
+    deref           go to state 46
+
+
+state 27
+
+   17 parameterList: register ',' . parameterList
+
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 18
+
+    register       go to state 20
+    parameterList  go to state 47
+
+
+state 28
+
+   22 function: ID LPAREN parameterList RPAREN . LCURLY statement_list RCURLY
+
+    LCURLY  shift, and go to state 48
+
+
+state 29
+
+    8 iptrDecls: '*' IPTR .
+    9          | '*' IPTR . ',' iptrDecls
+
+    ','  shift, and go to state 49
+
+    $default  reduce using rule 8 (iptrDecls)
+
+
+state 30
+
+    7 pointerDecls: INT iptrDecls ';' . CHAR cptrDecls
+
+    CHAR  shift, and go to state 50
+
+
+state 31
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR . '*' FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR . '*' FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    '*'  shift, and go to state 51
+
+
+state 32
+
+   18 parameterList: IPTR ',' parameterList .
+
+    $default  reduce using rule 18 (parameterList)
+
+
+state 33
+
+   34 statement: ID . LPAREN RPAREN ';'
+   35          | ID . LPAREN parameterList RPAREN ';'
+   39          | ID . LPAREN STRING_LITERAL RPAREN ';'
+
+    LPAREN  shift, and go to state 52
+
+
+state 34
+
+   43 statement: IF . LPAREN register relop register RPAREN GOTO ID ';'
+
+    LPAREN  shift, and go to state 53
+
+
+state 35
+
+   36 statement: IPTR . '=' ID LPAREN register RPAREN ';'
+   37          | IPTR . '=' '&' register ';'
+
+    '='  shift, and go to state 54
+
+
+state 36
+
+   38 statement: CPTR . '=' ID LPAREN register RPAREN ';'
+
+    '='  shift, and go to state 55
+
+
+state 37
+
+   33 statement: PUSHC . LPAREN I_REGISTER RPAREN ';'
+
+    LPAREN  shift, and go to state 56
+
+
+state 38
+
+   32 statement: PUSHI . LPAREN I_REGISTER RPAREN ';'
+
+    LPAREN  shift, and go to state 57
+
+
+state 39
+
+   41 statement: GOTO . ID ';'
+
+    ID  shift, and go to state 58
+
+
+state 40
+
+   42 statement: RETURN . ';'
+
+    ';'  shift, and go to state 59
+
+
+state 41
+
+   40 statement: LABEL .
+
+    $default  reduce using rule 40 (statement)
+
+
+state 42
+
+   44 deref: '*' . LPAREN FRAMEPTR '+' INTLITERAL RPAREN
+   45      | '*' . IPTR
+   46      | '*' . CPTR
+   47      | '*' . LPAREN ID '+' INTLITERAL RPAREN
+
+    IPTR    shift, and go to state 60
+    CPTR    shift, and go to state 61
+    LPAREN  shift, and go to state 62
+
+
+state 43
+
+   25 statement: register . '=' register op register ';'
+   26          | register . '=' register op INTLITERAL ';'
+   27          | register . '=' INTLITERAL op register ';'
+   28          | register . '=' register ';'
+   29          | register . '=' deref ';'
+   30          | register . '=' INTLITERAL ';'
+
+    '='  shift, and go to state 63
+
+
+state 44
+
+   21 function: ID LPAREN RPAREN LCURLY statement_list . RCURLY
+   24 statement_list: statement_list . statement
+
+    ID          shift, and go to state 33
+    IF          shift, and go to state 34
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 35
+    CPTR        shift, and go to state 36
+    PUSHC       shift, and go to state 37
+    PUSHI       shift, and go to state 38
+    RCURLY      shift, and go to state 64
+    GOTO        shift, and go to state 39
+    RETURN      shift, and go to state 40
+    LABEL       shift, and go to state 41
+    '*'         shift, and go to state 42
+
+    register   go to state 43
+    statement  go to state 65
+    deref      go to state 46
+
+
+state 45
+
+   23 statement_list: statement .
+
+    $default  reduce using rule 23 (statement_list)
+
+
+state 46
+
+   31 statement: deref . '=' register ';'
+
+    '='  shift, and go to state 66
+
+
+state 47
+
+   17 parameterList: register ',' parameterList .
+
+    $default  reduce using rule 17 (parameterList)
+
+
+state 48
+
+   22 function: ID LPAREN parameterList RPAREN LCURLY . statement_list RCURLY
+
+    ID          shift, and go to state 33
+    IF          shift, and go to state 34
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 35
+    CPTR        shift, and go to state 36
+    PUSHC       shift, and go to state 37
+    PUSHI       shift, and go to state 38
+    GOTO        shift, and go to state 39
+    RETURN      shift, and go to state 40
+    LABEL       shift, and go to state 41
+    '*'         shift, and go to state 42
+
+    register        go to state 43
+    statement_list  go to state 67
+    statement       go to state 45
+    deref           go to state 46
+
+
+state 49
+
+    9 iptrDecls: '*' IPTR ',' . iptrDecls
+
+    '*'  shift, and go to state 22
+
+    iptrDecls  go to state 68
+
+
+state 50
+
+    7 pointerDecls: INT iptrDecls ';' CHAR . cptrDecls
+
+    '*'  shift, and go to state 69
+
+    cptrDecls  go to state 70
+
+
+state 51
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' . FRAMEPTR ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' . FRAMEPTR ',' '*' STACKPTR ';' staticData
+
+    FRAMEPTR  shift, and go to state 71
+
+
+state 52
+
+   34 statement: ID LPAREN . RPAREN ';'
+   35          | ID LPAREN . parameterList RPAREN ';'
+   39          | ID LPAREN . STRING_LITERAL RPAREN ';'
+
+    STRING_LITERAL  shift, and go to state 72
+    I_REGISTER      shift, and go to state 17
+    IPTR            shift, and go to state 18
+    RPAREN          shift, and go to state 73
+
+    register       go to state 20
+    parameterList  go to state 74
+
+
+state 53
+
+   43 statement: IF LPAREN . register relop register RPAREN GOTO ID ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 75
+
+
+state 54
+
+   36 statement: IPTR '=' . ID LPAREN register RPAREN ';'
+   37          | IPTR '=' . '&' register ';'
+
+    ID   shift, and go to state 76
+    '&'  shift, and go to state 77
+
+
+state 55
+
+   38 statement: CPTR '=' . ID LPAREN register RPAREN ';'
+
+    ID  shift, and go to state 78
+
+
+state 56
+
+   33 statement: PUSHC LPAREN . I_REGISTER RPAREN ';'
+
+    I_REGISTER  shift, and go to state 79
+
+
+state 57
+
+   32 statement: PUSHI LPAREN . I_REGISTER RPAREN ';'
+
+    I_REGISTER  shift, and go to state 80
+
+
+state 58
+
+   41 statement: GOTO ID . ';'
+
+    ';'  shift, and go to state 81
+
+
+state 59
+
+   42 statement: RETURN ';' .
+
+    $default  reduce using rule 42 (statement)
+
+
+state 60
+
+   45 deref: '*' IPTR .
+
+    $default  reduce using rule 45 (deref)
+
+
+state 61
+
+   46 deref: '*' CPTR .
+
+    $default  reduce using rule 46 (deref)
+
+
+state 62
+
+   44 deref: '*' LPAREN . FRAMEPTR '+' INTLITERAL RPAREN
+   47      | '*' LPAREN . ID '+' INTLITERAL RPAREN
+
+    ID        shift, and go to state 82
+    FRAMEPTR  shift, and go to state 83
+
+
+state 63
+
+   25 statement: register '=' . register op register ';'
+   26          | register '=' . register op INTLITERAL ';'
+   27          | register '=' . INTLITERAL op register ';'
+   28          | register '=' . register ';'
+   29          | register '=' . deref ';'
+   30          | register '=' . INTLITERAL ';'
+
+    INTLITERAL  shift, and go to state 84
+    I_REGISTER  shift, and go to state 17
+    '*'         shift, and go to state 42
+
+    register  go to state 85
+    deref     go to state 86
+
+
+state 64
+
+   21 function: ID LPAREN RPAREN LCURLY statement_list RCURLY .
+
+    $default  reduce using rule 21 (function)
+
+
+state 65
+
+   24 statement_list: statement_list statement .
+
+    $default  reduce using rule 24 (statement_list)
+
+
+state 66
+
+   31 statement: deref '=' . register ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 87
+
+
+state 67
+
+   22 function: ID LPAREN parameterList RPAREN LCURLY statement_list . RCURLY
+   24 statement_list: statement_list . statement
+
+    ID          shift, and go to state 33
+    IF          shift, and go to state 34
+    I_REGISTER  shift, and go to state 17
+    IPTR        shift, and go to state 35
+    CPTR        shift, and go to state 36
+    PUSHC       shift, and go to state 37
+    PUSHI       shift, and go to state 38
+    RCURLY      shift, and go to state 88
+    GOTO        shift, and go to state 39
+    RETURN      shift, and go to state 40
+    LABEL       shift, and go to state 41
+    '*'         shift, and go to state 42
+
+    register   go to state 43
+    statement  go to state 65
+    deref      go to state 46
+
+
+state 68
+
+    9 iptrDecls: '*' IPTR ',' iptrDecls .
+
+    $default  reduce using rule 9 (iptrDecls)
+
+
+state 69
+
+   10 cptrDecls: '*' . CPTR
+   11          | '*' . CPTR ',' cptrDecls
+
+    CPTR  shift, and go to state 89
+
+
+state 70
+
+    7 pointerDecls: INT iptrDecls ';' CHAR cptrDecls .
+
+    $default  reduce using rule 7 (pointerDecls)
+
+
+state 71
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR . ',' '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR . ',' '*' STACKPTR ';' staticData
+
+    ','  shift, and go to state 90
+
+
+state 72
+
+   39 statement: ID LPAREN STRING_LITERAL . RPAREN ';'
+
+    RPAREN  shift, and go to state 91
+
+
+state 73
+
+   34 statement: ID LPAREN RPAREN . ';'
+
+    ';'  shift, and go to state 92
+
+
+state 74
+
+   35 statement: ID LPAREN parameterList . RPAREN ';'
+
+    RPAREN  shift, and go to state 93
+
+
+state 75
+
+   43 statement: IF LPAREN register . relop register RPAREN GOTO ID ';'
+
+    '='  shift, and go to state 94
+    '<'  shift, and go to state 95
+    '>'  shift, and go to state 96
+    '!'  shift, and go to state 97
+
+    relop  go to state 98
+
+
+state 76
+
+   36 statement: IPTR '=' ID . LPAREN register RPAREN ';'
+
+    LPAREN  shift, and go to state 99
+
+
+state 77
+
+   37 statement: IPTR '=' '&' . register ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 100
+
+
+state 78
+
+   38 statement: CPTR '=' ID . LPAREN register RPAREN ';'
+
+    LPAREN  shift, and go to state 101
+
+
+state 79
+
+   33 statement: PUSHC LPAREN I_REGISTER . RPAREN ';'
+
+    RPAREN  shift, and go to state 102
+
+
+state 80
+
+   32 statement: PUSHI LPAREN I_REGISTER . RPAREN ';'
+
+    RPAREN  shift, and go to state 103
+
+
+state 81
+
+   41 statement: GOTO ID ';' .
+
+    $default  reduce using rule 41 (statement)
+
+
+state 82
+
+   47 deref: '*' LPAREN ID . '+' INTLITERAL RPAREN
+
+    '+'  shift, and go to state 104
+
+
+state 83
+
+   44 deref: '*' LPAREN FRAMEPTR . '+' INTLITERAL RPAREN
+
+    '+'  shift, and go to state 105
+
+
+state 84
+
+   27 statement: register '=' INTLITERAL . op register ';'
+   30          | register '=' INTLITERAL . ';'
+
+    ';'  shift, and go to state 106
+    '*'  shift, and go to state 107
+    '&'  shift, and go to state 108
+    '+'  shift, and go to state 109
+    '-'  shift, and go to state 110
+    '/'  shift, and go to state 111
+    '%'  shift, and go to state 112
+    '<'  shift, and go to state 113
+    '>'  shift, and go to state 114
+    '|'  shift, and go to state 115
+    '^'  shift, and go to state 116
+    '~'  shift, and go to state 117
+
+    op  go to state 118
+
+
+state 85
+
+   25 statement: register '=' register . op register ';'
+   26          | register '=' register . op INTLITERAL ';'
+   28          | register '=' register . ';'
+
+    ';'  shift, and go to state 119
+    '*'  shift, and go to state 107
+    '&'  shift, and go to state 108
+    '+'  shift, and go to state 109
+    '-'  shift, and go to state 110
+    '/'  shift, and go to state 111
+    '%'  shift, and go to state 112
+    '<'  shift, and go to state 113
+    '>'  shift, and go to state 114
+    '|'  shift, and go to state 115
+    '^'  shift, and go to state 116
+    '~'  shift, and go to state 117
+
+    op  go to state 120
+
+
+state 86
+
+   29 statement: register '=' deref . ';'
+
+    ';'  shift, and go to state 121
+
+
+state 87
+
+   31 statement: deref '=' register . ';'
+
+    ';'  shift, and go to state 122
+
+
+state 88
+
+   22 function: ID LPAREN parameterList RPAREN LCURLY statement_list RCURLY .
+
+    $default  reduce using rule 22 (function)
+
+
+state 89
+
+   10 cptrDecls: '*' CPTR .
+   11          | '*' CPTR . ',' cptrDecls
+
+    ','  shift, and go to state 123
+
+    $default  reduce using rule 10 (cptrDecls)
+
+
+state 90
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' . '*' STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' . '*' STACKPTR ';' staticData
+
+    '*'  shift, and go to state 124
+
+
+state 91
+
+   39 statement: ID LPAREN STRING_LITERAL RPAREN . ';'
+
+    ';'  shift, and go to state 125
+
+
+state 92
+
+   34 statement: ID LPAREN RPAREN ';' .
+
+    $default  reduce using rule 34 (statement)
+
+
+state 93
+
+   35 statement: ID LPAREN parameterList RPAREN . ';'
+
+    ';'  shift, and go to state 126
+
+
+state 94
+
+   61 relop: '=' . '='
+
+    '='  shift, and go to state 127
+
+
+state 95
+
+   60 relop: '<' .
+   64      | '<' . '='
+
+    '='  shift, and go to state 128
+
+    $default  reduce using rule 60 (relop)
+
+
+state 96
+
+   59 relop: '>' .
+   63      | '>' . '='
+
+    '='  shift, and go to state 129
+
+    $default  reduce using rule 59 (relop)
+
+
+state 97
+
+   62 relop: '!' . '='
+
+    '='  shift, and go to state 130
+
+
+state 98
+
+   43 statement: IF LPAREN register relop . register RPAREN GOTO ID ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 131
+
+
+state 99
+
+   36 statement: IPTR '=' ID LPAREN . register RPAREN ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 132
+
+
+state 100
+
+   37 statement: IPTR '=' '&' register . ';'
+
+    ';'  shift, and go to state 133
+
+
+state 101
+
+   38 statement: CPTR '=' ID LPAREN . register RPAREN ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 134
+
+
+state 102
+
+   33 statement: PUSHC LPAREN I_REGISTER RPAREN . ';'
+
+    ';'  shift, and go to state 135
+
+
+state 103
+
+   32 statement: PUSHI LPAREN I_REGISTER RPAREN . ';'
+
+    ';'  shift, and go to state 136
+
+
+state 104
+
+   47 deref: '*' LPAREN ID '+' . INTLITERAL RPAREN
+
+    INTLITERAL  shift, and go to state 137
+
+
+state 105
+
+   44 deref: '*' LPAREN FRAMEPTR '+' . INTLITERAL RPAREN
+
+    INTLITERAL  shift, and go to state 138
+
+
+state 106
+
+   30 statement: register '=' INTLITERAL ';' .
+
+    $default  reduce using rule 30 (statement)
+
+
+state 107
+
+   48 op: '*' .
+
+    $default  reduce using rule 48 (op)
+
+
+state 108
+
+   55 op: '&' .
+
+    $default  reduce using rule 55 (op)
+
+
+state 109
+
+   49 op: '+' .
+
+    $default  reduce using rule 49 (op)
+
+
+state 110
+
+   50 op: '-' .
+
+    $default  reduce using rule 50 (op)
+
+
+state 111
+
+   51 op: '/' .
+
+    $default  reduce using rule 51 (op)
+
+
+state 112
+
+   52 op: '%' .
+
+    $default  reduce using rule 52 (op)
+
+
+state 113
+
+   53 op: '<' . '<'
+
+    '<'  shift, and go to state 139
+
+
+state 114
+
+   54 op: '>' . '>'
+
+    '>'  shift, and go to state 140
+
+
+state 115
+
+   56 op: '|' .
+
+    $default  reduce using rule 56 (op)
+
+
+state 116
+
+   57 op: '^' .
+
+    $default  reduce using rule 57 (op)
+
+
+state 117
+
+   58 op: '~' .
+
+    $default  reduce using rule 58 (op)
+
+
+state 118
+
+   27 statement: register '=' INTLITERAL op . register ';'
+
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 141
+
+
+state 119
+
+   28 statement: register '=' register ';' .
+
+    $default  reduce using rule 28 (statement)
+
+
+state 120
+
+   25 statement: register '=' register op . register ';'
+   26          | register '=' register op . INTLITERAL ';'
+
+    INTLITERAL  shift, and go to state 142
+    I_REGISTER  shift, and go to state 17
+
+    register  go to state 143
+
+
+state 121
+
+   29 statement: register '=' deref ';' .
+
+    $default  reduce using rule 29 (statement)
+
+
+state 122
+
+   31 statement: deref '=' register ';' .
+
+    $default  reduce using rule 31 (statement)
+
+
+state 123
+
+   11 cptrDecls: '*' CPTR ',' . cptrDecls
+
+    '*'  shift, and go to state 69
+
+    cptrDecls  go to state 144
+
+
+state 124
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' . STACKPTR ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' . STACKPTR ';' staticData
+
+    STACKPTR  shift, and go to state 145
+
+
+state 125
+
+   39 statement: ID LPAREN STRING_LITERAL RPAREN ';' .
+
+    $default  reduce using rule 39 (statement)
+
+
+state 126
+
+   35 statement: ID LPAREN parameterList RPAREN ';' .
+
+    $default  reduce using rule 35 (statement)
+
+
+state 127
+
+   61 relop: '=' '=' .
+
+    $default  reduce using rule 61 (relop)
+
+
+state 128
+
+   64 relop: '<' '=' .
+
+    $default  reduce using rule 64 (relop)
+
+
+state 129
+
+   63 relop: '>' '=' .
+
+    $default  reduce using rule 63 (relop)
+
+
+state 130
+
+   62 relop: '!' '=' .
+
+    $default  reduce using rule 62 (relop)
+
+
+state 131
+
+   43 statement: IF LPAREN register relop register . RPAREN GOTO ID ';'
+
+    RPAREN  shift, and go to state 146
+
+
+state 132
+
+   36 statement: IPTR '=' ID LPAREN register . RPAREN ';'
+
+    RPAREN  shift, and go to state 147
+
+
+state 133
+
+   37 statement: IPTR '=' '&' register ';' .
+
+    $default  reduce using rule 37 (statement)
+
+
+state 134
+
+   38 statement: CPTR '=' ID LPAREN register . RPAREN ';'
+
+    RPAREN  shift, and go to state 148
+
+
+state 135
+
+   33 statement: PUSHC LPAREN I_REGISTER RPAREN ';' .
+
+    $default  reduce using rule 33 (statement)
+
+
+state 136
+
+   32 statement: PUSHI LPAREN I_REGISTER RPAREN ';' .
+
+    $default  reduce using rule 32 (statement)
+
+
+state 137
+
+   47 deref: '*' LPAREN ID '+' INTLITERAL . RPAREN
+
+    RPAREN  shift, and go to state 149
+
+
+state 138
+
+   44 deref: '*' LPAREN FRAMEPTR '+' INTLITERAL . RPAREN
+
+    RPAREN  shift, and go to state 150
+
+
+state 139
+
+   53 op: '<' '<' .
+
+    $default  reduce using rule 53 (op)
+
+
+state 140
+
+   54 op: '>' '>' .
+
+    $default  reduce using rule 54 (op)
+
+
+state 141
+
+   27 statement: register '=' INTLITERAL op register . ';'
+
+    ';'  shift, and go to state 151
+
+
+state 142
+
+   26 statement: register '=' register op INTLITERAL . ';'
+
+    ';'  shift, and go to state 152
+
+
+state 143
+
+   25 statement: register '=' register op register . ';'
+
+    ';'  shift, and go to state 153
+
+
+state 144
+
+   11 cptrDecls: '*' CPTR ',' cptrDecls .
+
+    $default  reduce using rule 11 (cptrDecls)
+
+
+state 145
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR . ';'
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR . ';' staticData
+
+    ';'  shift, and go to state 154
+
+
+state 146
+
+   43 statement: IF LPAREN register relop register RPAREN . GOTO ID ';'
+
+    GOTO  shift, and go to state 155
+
+
+state 147
+
+   36 statement: IPTR '=' ID LPAREN register RPAREN . ';'
+
+    ';'  shift, and go to state 156
+
+
+state 148
+
+   38 statement: CPTR '=' ID LPAREN register RPAREN . ';'
+
+    ';'  shift, and go to state 157
+
+
+state 149
+
+   47 deref: '*' LPAREN ID '+' INTLITERAL RPAREN .
+
+    $default  reduce using rule 47 (deref)
+
+
+state 150
+
+   44 deref: '*' LPAREN FRAMEPTR '+' INTLITERAL RPAREN .
+
+    $default  reduce using rule 44 (deref)
+
+
+state 151
+
+   27 statement: register '=' INTLITERAL op register ';' .
+
+    $default  reduce using rule 27 (statement)
+
+
+state 152
+
+   26 statement: register '=' register op INTLITERAL ';' .
+
+    $default  reduce using rule 26 (statement)
+
+
+state 153
+
+   25 statement: register '=' register op register ';' .
+
+    $default  reduce using rule 25 (statement)
+
+
+state 154
+
+    2 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' .
+    3        | INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' . staticData
+
+    CHAR  shift, and go to state 158
+
+    $default  reduce using rule 2 (globals)
+
+    staticData  go to state 159
+    staticDecl  go to state 160
+
+
+state 155
+
+   43 statement: IF LPAREN register relop register RPAREN GOTO . ID ';'
+
+    ID  shift, and go to state 161
+
+
+state 156
+
+   36 statement: IPTR '=' ID LPAREN register RPAREN ';' .
+
+    $default  reduce using rule 36 (statement)
+
+
+state 157
+
+   38 statement: CPTR '=' ID LPAREN register RPAREN ';' .
+
+    $default  reduce using rule 38 (statement)
+
+
+state 158
+
+    6 staticDecl: CHAR . ID LBRACKET INTLITERAL RBRACKET ';'
+
+    ID  shift, and go to state 162
+
+
+state 159
+
+    3 globals: INT intDeclaration ';' pointerDecls ';' CHAR '*' FRAMEPTR ',' '*' STACKPTR ';' staticData .
+
+    $default  reduce using rule 3 (globals)
+
+
+state 160
+
+    4 staticData: staticDecl .
+    5           | staticDecl . staticData
+
+    CHAR  shift, and go to state 158
+
+    $default  reduce using rule 4 (staticData)
+
+    staticData  go to state 163
+    staticDecl  go to state 160
+
+
+state 161
+
+   43 statement: IF LPAREN register relop register RPAREN GOTO ID . ';'
+
+    ';'  shift, and go to state 164
+
+
+state 162
+
+    6 staticDecl: CHAR ID . LBRACKET INTLITERAL RBRACKET ';'
+
+    LBRACKET  shift, and go to state 165
+
+
+state 163
+
+    5 staticData: staticDecl staticData .
+
+    $default  reduce using rule 5 (staticData)
+
+
+state 164
+
+   43 statement: IF LPAREN register relop register RPAREN GOTO ID ';' .
+
+    $default  reduce using rule 43 (statement)
+
+
+state 165
+
+    6 staticDecl: CHAR ID LBRACKET . INTLITERAL RBRACKET ';'
+
+    INTLITERAL  shift, and go to state 166
+
+
+state 166
+
+    6 staticDecl: CHAR ID LBRACKET INTLITERAL . RBRACKET ';'
+
+    RBRACKET  shift, and go to state 167
+
+
+state 167
+
+    6 staticDecl: CHAR ID LBRACKET INTLITERAL RBRACKET . ';'
+
+    ';'  shift, and go to state 168
+
+
+state 168
+
+    6 staticDecl: CHAR ID LBRACKET INTLITERAL RBRACKET ';' .
+
+    $default  reduce using rule 6 (staticDecl)

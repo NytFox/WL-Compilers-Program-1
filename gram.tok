@@ -5,6 +5,7 @@ extern "C"
 	int yyparse(void);
 }
 #include "symtab_class_header.h"
+#include <ctype.h>
 //original
 char *start_expression_string(Symbol *symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
@@ -14,6 +15,9 @@ char *new_registrator();
 void function_call(Symbol *func, Symbol *para);
 char *Calc_exponential(const char *r1,const char *r2);
 int assign_next_lable();
+char *get_number(int num);
+bool is_number(const char *string);
+void cal_operation(char oprator,const char *left, const char *right);
 extern int assign_next_register();
 %}
 
