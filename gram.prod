@@ -38,7 +38,7 @@ expression : expression '+' term
 		{
 		    //printf("\nSeen ADD_OP\n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << $1 << " + "<< $3<<";"<<endl;
+		    cal_operation('+',$1,$3,rd);
 		    $$ = rd;
 
 		}
@@ -47,8 +47,7 @@ expression : expression '+' term
 		    // printf("\nSeen ADD_OP\n\n"); 
 		   	char *rd = new_registrator();
 		    //cout<< rd <<" = " << $1 << " - "<< $3<<";"<<endl;
-		    cout<< rd <<" = ";
-		    cal_operation('-',$1,$3);
+		    cal_operation('-',$1,$3,rd);
 		    $$ = rd;
 		    
 		}
@@ -63,14 +62,14 @@ term : 	term '*' factor
 		{
 		    // printf("\nSeen MUL_OP \n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << $1 << " * "<< $3<<";"<<endl;
+		    cal_operation('*',$1,$3,rd);
 		    $$ = rd;
 		}
 		| term '/' factor 
 		{
 		    // printf("\nSeen MUL_OP \n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << $1 << " / "<< $3<<";"<<endl;
+		    cal_operation('/',$1,$3,rd);
 		    $$ = rd;
 		}
 	   	| factor
@@ -229,7 +228,7 @@ bool is_number(const char *string)
 	return 1;
 }
 
-void cal_operation(char oprator,const char *left, const char *right)
+void cal_operation(char oprator,const char *left, const char *right, const char *target)
 {
 	int temp;
 	int a,b;
@@ -239,22 +238,27 @@ void cal_operation(char oprator,const char *left, const char *right)
 		a = atoi(left);
 		b = atoi(right);
 
+		char *rd_1 = new_registrator();
+		char *rd_2 = new_registrator();
+		cout<< rd_1 <<" = " << a <<endl;
+		cout<< rd_2 <<" = " << b <<endl;
+		cout<< target << " = ";
 		switch(oprator)
 		{
 			case '+':{
-				cout<<a+b;
+				cout<<rd_1<<"+"<<rd_2;
 				break;
 			}
 			case '-':{
-				cout<<a-b;
+				cout<<rd_1<<"-"<<rd_2;
 				break;
 			}
 			case '*':{
-				cout<<a*b;
+				cout<<rd_1<<"*"<<rd_2;
 				break;
 			}
 			case '/':{
-				cout<<a/b;
+				cout<<rd_1<<"/"<<rd_2;
 				break;
 			}
 			default: break;
@@ -262,6 +266,7 @@ void cal_operation(char oprator,const char *left, const char *right)
 	}
 	else
 	{
+		cout<< target << " = ";
 		//cout<< "T2"<<endl;
 		switch(oprator)
 		{
