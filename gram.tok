@@ -32,6 +32,12 @@ extern int assign_next_register();
 %token END_E
 %token ASG 
 %token EXPO
+%token INT
+%token CHAR
+%token LONG
+%token ENUM
+%token DO
+%token IF
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
 

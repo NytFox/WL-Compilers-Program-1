@@ -24,6 +24,13 @@ begin								{ return (BEGIN_E);	}
 
 end									{ return (END_E);	}					
 
+int									{ fflush(stdout); return (INT);	}
+char								{ fflush(stdout); return (CHAR);	}
+long								{ fflush(stdout); return (LONG);	}
+enum								{ fflush(stdout); return (ENUM);	}
+if									{ fflush(stdout); return (IF);	}
+DO									{ fflush(stdout); return (DO);	}
+
 [ \t\n]+							{ /* delete */		}
 
 {Letter}({Letter}|{Digit}|_)*		{ process_id();
