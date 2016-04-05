@@ -19,6 +19,7 @@ int assign_next_register();
 %}
 
 %%
+main 								{ return (MAIN);	}
 
 begin								{ return (BEGIN_E);	}
 
@@ -26,10 +27,21 @@ end									{ return (END_E);	}
 
 int									{ fflush(stdout); return (INT);	}
 char								{ fflush(stdout); return (CHAR);	}
+void 								{ fflush(stdout); return (VOID);	}
 long								{ fflush(stdout); return (LONG);	}
 enum								{ fflush(stdout); return (ENUM);	}
 if									{ fflush(stdout); return (IF);	}
+else								{ fflush(stdout); return (ELSE);	}
 DO									{ fflush(stdout); return (DO);	}
+
+and									{ fflush(stdout); return (AND);	}
+or 									{ fflush(stdout); return (OR);	}
+lt									{ fflush(stdout); return (LT);	}
+gt									{ fflush(stdout); return (GT);	}
+eq									{ fflush(stdout); return (EQ);	}
+neq									{ fflush(stdout); return (NEQ);	}
+ge									{ fflush(stdout); return (GE);	}
+le 									{ fflush(stdout); return (LE);	}
 
 [ \t\n]+							{ /* delete */		}
 
@@ -48,6 +60,11 @@ DO									{ fflush(stdout); return (DO);	}
 "+"									{ return ('+');		}
 "("									{ return ('(');		}
 ")"									{ return (')');		}
+"["									{ return ('[');		}
+"]"									{ return (']');		}
+","									{ return (',');		}
+":"									{ return (':');		}
+"."									{ return ('.');		}
 %%
 
 void process_id()

@@ -28,6 +28,8 @@ extern int assign_next_register();
         Symbol* symbolstuff;  
 }
 
+
+%token MAIN
 %token BEGIN_E
 %token END_E
 %token ASG 
@@ -36,8 +38,18 @@ extern int assign_next_register();
 %token CHAR
 %token LONG
 %token ENUM
+%token VOID
 %token DO
 %token IF
+%token ELSE
+%token <stringstuff> AND
+%token <stringstuff> OR
+%token <stringstuff> LT
+%token <stringstuff> GT
+%token <stringstuff> EQ
+%token <stringstuff> NEQ
+%token <stringstuff> LE
+%token <stringstuff> GE
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
 
@@ -46,4 +58,9 @@ extern int assign_next_register();
 %type <stringstuff> expression 
 %type <stringstuff> statement
 %type <stringstuff> parentheses
-
+%type <stringstuff> declaration
+%type <stringstuff> declaration_item
+%type <stringstuff> arraycontent
+%type <stringstuff> if_content
+%type <stringstuff> sBlock
+%type <stringstuff> comparison

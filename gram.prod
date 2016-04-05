@@ -5,20 +5,126 @@ statement_list  :  statement_list statement
                 | statement
                 ;
 
-statement  : BEGIN_E ';'
+statement  : MAIN  '(' ')' ':' VOID BEGIN_E
+			{
+				cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nmain()\n{\ninitstack();\n"<<endl;
+			}
+			;
+statement  : BEGIN_E
 		{
 			//printf("\nSeen BEGIN\n\n");
-			cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n\nmain()\n{\ninitstack();\n"<<endl;
+			cout << "{\n"<<endl;
 		}
 		;
 
-statement  : END_E ';'
+statement  : END_E 
 		{
 			//printf("\nSeen END;\n\n"); 
 			cout << "}\n"<<endl;
 		}
 		;
-		
+
+
+statement : IF '(' if_content ')' BEGIN_E sBlock END_E ELSE BEGIN_E sBlock END_E
+			{
+
+			}
+			| IF '(' if_content ')' BEGIN_E sBlock END_E
+			{
+
+			}
+			;
+			
+sBlock : statement
+		{
+
+		}
+		;
+
+if_content : comparison AND if_content
+			{
+
+			}
+			|comparison OR if_content
+			{
+
+			}
+			| comparison
+			{
+
+			}
+			;
+
+comparison : expression '.' GT '.' expression
+			{
+
+			}
+			|expression '.' LT '.' expression
+			{
+
+			}
+			|expression '.' GE '.' expression
+			{
+
+			}
+			|expression '.' LE '.' expression
+			{
+
+			}
+			|expression '.' EQ '.' expression
+			{
+
+			}
+			|expression '.' NEQ '.' expression
+			{
+
+			}
+			;
+
+
+
+statement : declaration
+			{
+
+			}
+			;
+			
+declaration : declaration_item ';' declaration
+			{
+				printf("\nSeen sequent declaration;\n\n");
+			}
+			| declaration_item
+			{
+				printf("\nSeen single declaration;\n\n");
+			}
+			;
+
+declaration_item : type ID '[' arraycontent ']'
+			{
+				printf("\nSeen array declaration;\n\n");
+			}
+			| type ID
+			{
+				printf("\nSeen type declaration;\n\n");
+			}
+			;
+
+arraycontent: INTLITERAL ',' arraycontent
+			{
+				printf("\nSeen multi-dimention array declaration;\n\n");
+			}
+			| INTLITERAL
+			{
+				printf("\nSeen 1D array declaration;\n\n");
+			}
+			;
+
+
+type		: INT
+			| CHAR
+			| LONG
+			;
+
 statement  : ID '(' ID ')' ';'
 		{
 			//printf("\nSeen FUNCTION\n\n"); 

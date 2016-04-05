@@ -5,6 +5,7 @@ extern "C"
 	int yyparse(void);
 }
 #include "symtab_class_header.h"
+#include <ctype.h>
 //original
 char *start_expression_string(Symbol *symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
@@ -15,7 +16,8 @@ void function_call(Symbol *func, Symbol *para);
 char *Calc_exponential(const char *r1,const char *r2);
 int assign_next_lable();
 char *get_number(int num);
-void cal_operation(char oprator,const char *left, const char *right);
+bool is_number(const char *string);
+void cal_operation(char oprator,const char *left, const char *right,const char *target);
 extern int assign_next_register();
 %}
 
@@ -26,10 +28,28 @@ extern int assign_next_register();
         Symbol* symbolstuff;  
 }
 
+
+%token MAIN
 %token BEGIN_E
 %token END_E
 %token ASG 
 %token EXPO
+%token INT
+%token CHAR
+%token LONG
+%token ENUM
+%token VOID
+%token DO
+%token IF
+%token ELSE
+%token <stringstuff> AND
+%token <stringstuff> OR
+%token <stringstuff> LT
+%token <stringstuff> GT
+%token <stringstuff> EQ
+%token <stringstuff> NEQ
+%token <stringstuff> LE
+%token <stringstuff> GE
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
 
@@ -38,7 +58,12 @@ extern int assign_next_register();
 %type <stringstuff> expression 
 %type <stringstuff> statement
 %type <stringstuff> parentheses
+%type <stringstuff> declaration
+%type <stringstuff> declaration_item
+%type <stringstuff> arraycontent
+%type <stringstuff> if_content
 
+%type <stringstuff> comparison
 %start statement_list 
 
 %%
@@ -46,20 +71,120 @@ statement_list  :  statement_list statement
                 | statement
                 ;
 
-statement  : BEGIN_E ';'
+statement  : MAIN  '(' ')' ':' VOID BEGIN_E
+			{
+				cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nmain()\n{\ninitstack();\n"<<endl;
+			}
+			;
+statement  : BEGIN_E
 		{
 			//printf("\nSeen BEGIN\n\n");
-			cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n\nmain()\n{\ninitstack();\n"<<endl;
+			cout << "{\n"<<endl;
 		}
 		;
 
-statement  : END_E ';'
+statement  : END_E 
 		{
 			//printf("\nSeen END;\n\n"); 
 			cout << "}\n"<<endl;
 		}
 		;
-		
+
+
+statement : 	IF '(' if_content ')' statement ELSE statement
+			{
+
+			}
+			| IF '(' if_content ')' statement
+			{
+
+			}
+			;
+
+if_content : comparison AND if_content
+			{
+
+			}
+			|comparison OR if_content
+			{
+
+			}
+			| comparison
+			{
+
+			}
+			;
+
+comparison : expression '.' GT '.' expression
+			{
+
+			}
+			|expression '.' LT '.' expression
+			{
+
+			}
+			|expression '.' GE '.' expression
+			{
+
+			}
+			|expression '.' LE '.' expression
+			{
+
+			}
+			|expression '.' EQ '.' expression
+			{
+
+			}
+			|expression '.' NEQ '.' expression
+			{
+
+			}
+			|
+			;
+
+
+
+statement : declaration
+			{
+
+			}
+			;
+declaration : declaration_item ';' declaration
+			{
+				printf("\nSeen sequent declaration;\n\n");
+			}
+			| declaration_item
+			{
+				printf("\nSeen single declaration;\n\n");
+			}
+			;
+
+declaration_item : type ID '[' arraycontent ']'
+			{
+				printf("\nSeen array declaration;\n\n");
+			}
+			| type ID
+			{
+				printf("\nSeen type declaration;\n\n");
+			}
+			;
+
+arraycontent: INTLITERAL ',' arraycontent
+			{
+				printf("\nSeen multi-dimention array declaration;\n\n");
+			}
+			| INTLITERAL
+			{
+				printf("\nSeen 1D array declaration;\n\n");
+			}
+			;
+
+
+type		: INT
+			| CHAR
+			| LONG
+			;
+
 statement  : ID '(' ID ')' ';'
 		{
 			//printf("\nSeen FUNCTION\n\n"); 
@@ -79,7 +204,7 @@ expression : expression '+' term
 		{
 		    //printf("\nSeen ADD_OP\n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << $1 << " + "<< $3<<";"<<endl;
+		    cal_operation('+',$1,$3,rd);
 		    $$ = rd;
 
 		}
@@ -88,8 +213,7 @@ expression : expression '+' term
 		    // printf("\nSeen ADD_OP\n\n"); 
 		   	char *rd = new_registrator();
 		    //cout<< rd <<" = " << $1 << " - "<< $3<<";"<<endl;
-		    cout<< rd <<" = ";
-		    cal_operation('-',$1,$3);
+		    cal_operation('-',$1,$3,rd);
 		    $$ = rd;
 		    
 		}
@@ -104,14 +228,14 @@ term : 	term '*' factor
 		{
 		    // printf("\nSeen MUL_OP \n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << $1 << " * "<< $3<<";"<<endl;
+		    cal_operation('*',$1,$3,rd);
 		    $$ = rd;
 		}
 		| term '/' factor 
 		{
 		    // printf("\nSeen MUL_OP \n\n"); 
 		    char *rd = new_registrator();
-		    cout<< rd <<" = " << $1 << " / "<< $3<<";"<<endl;
+		    cal_operation('/',$1,$3,rd);
 		    $$ = rd;
 		}
 	   	| factor
@@ -258,31 +382,49 @@ char *get_number(int num)
 	return buffer;
 }
 
+bool is_number(const char *string)
+{
+	bool result = 0;
+	for(int i=0;i<strlen(string);i++)
+	{
+		result = isdigit(string[i]);
+		if(!result)
+			return 0;
+	}
+	return 1;
+}
 
-void cal_operation(char oprator,const char *left, const char *right)
+void cal_operation(char oprator,const char *left, const char *right, const char *target)
 {
 	int temp;
 	int a,b;
-	if(atoi(left)&&atoi(right))
+	if(is_number(left)&&is_number(right))
 	{
+		//cout<< "T1"<<endl;
 		a = atoi(left);
 		b = atoi(right);
-		switch(*oprator)
+
+		char *rd_1 = new_registrator();
+		char *rd_2 = new_registrator();
+		cout<< rd_1 <<" = " << a <<endl;
+		cout<< rd_2 <<" = " << b <<endl;
+		cout<< target << " = ";
+		switch(oprator)
 		{
 			case '+':{
-				cout<<a+b;
+				cout<<rd_1<<"+"<<rd_2;
 				break;
 			}
 			case '-':{
-				cout<<a-b;
+				cout<<rd_1<<"-"<<rd_2;
 				break;
 			}
 			case '*':{
-				cout<<a*b;
+				cout<<rd_1<<"*"<<rd_2;
 				break;
 			}
 			case '/':{
-				cout<<a/b;
+				cout<<rd_1<<"/"<<rd_2;
 				break;
 			}
 			default: break;
@@ -290,6 +432,8 @@ void cal_operation(char oprator,const char *left, const char *right)
 	}
 	else
 	{
+		cout<< target << " = ";
+		//cout<< "T2"<<endl;
 		switch(oprator)
 		{
 			case '+':{
@@ -311,7 +455,7 @@ void cal_operation(char oprator,const char *left, const char *right)
 			default: break;
 		}
 	}
-	cout<<";"<<end;
+	cout<<";"<<endl;
 }
 
 
