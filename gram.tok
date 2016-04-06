@@ -42,6 +42,8 @@ extern int assign_next_register();
 %token DO
 %token IF
 %token ELSE
+%token CONTINUE
+
 %token <stringstuff> AND
 %token <stringstuff> OR
 %token <stringstuff> LT
@@ -64,3 +66,7 @@ extern int assign_next_register();
 %type <stringstuff> if_content
 %type <stringstuff> sBlock
 %type <stringstuff> comparison
+%type <stringstuff> do_loop_statement
+%type <stringstuff> do_begin
+%type <stringstuff> do_content
+%type <stringstuff> do_end

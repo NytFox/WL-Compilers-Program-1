@@ -33,6 +33,7 @@ enum								{ fflush(stdout); return (ENUM);	}
 if									{ fflush(stdout); return (IF);	}
 else								{ fflush(stdout); return (ELSE);	}
 DO									{ fflush(stdout); return (DO);	}
+continue							{ fflush(stdout); return (CONTINUE);	}
 
 and									{ fflush(stdout); return (AND);	}
 or 									{ fflush(stdout); return (OR);	}

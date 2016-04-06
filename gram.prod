@@ -24,7 +24,7 @@ statement  : END_E
 		}
 		;
 
-
+//************************ IF Statement **************************//
 statement : IF '(' if_content ')' BEGIN_E sBlock END_E ELSE BEGIN_E sBlock END_E
 			{
 
@@ -82,7 +82,7 @@ comparison : expression '.' GT '.' expression
 			;
 
 
-
+//************************ Variable Declaration **************************//
 statement : declaration
 			{
 
@@ -125,6 +125,41 @@ type		: INT
 			| LONG
 			;
 
+//************************ Do Loop Statement **************************//
+statement : do_loop_statement
+			{
+
+			}
+			;
+
+do_loop_statement : do_begin do_content do_end 
+			{
+
+			}
+			;
+
+do_begin : DO INTLITERAL ID '=' INTLITERAL ',' INTLITERAL ',' INTLITERAL
+			{
+
+			}
+			;
+
+do_content : statement
+			{
+
+			}
+			;
+
+do_end : INTLITERAL CONTINUE
+			{
+
+			}
+			;
+
+
+			
+
+//************************ Function call **************************//
 statement  : ID '(' ID ')' ';'
 		{
 			//printf("\nSeen FUNCTION\n\n"); 
@@ -132,6 +167,8 @@ statement  : ID '(' ID ')' ';'
 		}
 		;
 
+
+//************************ Expression Calculation **************************//
 statement  : ID ASG expression ';' 
 		{ 
 			//printf("\nSeen EXP PASSING\n\n");
