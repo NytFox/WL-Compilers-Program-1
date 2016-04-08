@@ -1,0 +1,11 @@
+Here a CTRAN loop we wish to translate
+
+/*  a loop to test   **********************
+    r3 = 0
+    do 200 r1 = 1, 10, 1
+        do 100 r2 = 1, r1, 1
+            r3  = r3  + 1 
+        100 continue
+    200 continue
+*/
+

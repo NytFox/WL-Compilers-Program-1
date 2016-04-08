@@ -32,7 +32,7 @@ long								{ fflush(stdout); return (LONG);	}
 enum								{ fflush(stdout); return (ENUM);	}
 if									{ fflush(stdout); return (IF);	}
 else								{ fflush(stdout); return (ELSE);	}
-DO									{ fflush(stdout); return (DO);	}
+do									{ fflush(stdout); return (DO);	}
 continue							{ fflush(stdout); return (CONTINUE);	}
 
 and									{ fflush(stdout); return (AND);	}
@@ -52,7 +52,7 @@ le 									{ fflush(stdout); return (LE);	}
 {IntLit}							{ yylval.intstuff = atoi(yytext);
 				          			  return (INTLITERAL);	}
 
-"="									{ return (ASG);		}
+"="									{ return ('=');		}
 ";"									{ return (';');		}
 "*"									{ return ('*');		}
 "**"								{ return (EXPO);	}
@@ -66,6 +66,11 @@ le 									{ fflush(stdout); return (LE);	}
 ","									{ return (',');		}
 ":"									{ return (':');		}
 "."									{ return ('.');		}
+"<<"								{ return (LEFT_SHIFT);		}
+">>"								{ return (RIGHT_SHIFT);		}
+'^'									{ return ('^');		}
+'|'									{ return ('|');		}
+'&'									{ return ('&');		}
 %%
 
 void process_id()

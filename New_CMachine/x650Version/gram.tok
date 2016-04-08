@@ -1,0 +1,42 @@
+%{
+#include "defs.h"
+void yyerror(char *s);
+%}
+
+%union { /* Define stack type */
+        int intstuff;
+}
+
+%token		ID
+%token		IF
+%token		INT
+%token		FLOAT
+%token		DOUBLE
+%token		CHAR
+%token		STRING_LITERAL
+%token		INTLITERAL
+%token		C_REGISTER
+%token		I_REGISTER
+%token		F_REGISTER
+%token		D_REGISTER
+%token		IPTR
+%token		CPTR
+%token		PUSHC
+%token		PUSHI
+%token		PUSHF
+%token		PUSHD
+%token		FRAMEPTR
+%token		STACKPTR
+%token		LBRACKET
+%token		RBRACKET
+%token		LPAREN
+%token		RPAREN
+%token		RCURLY
+%token		LCURLY
+%token		GOTO
+%token		RETURN
+%token		LABEL
+
+/* %program function statement statement_list op relop intDeclaration globals*/
+
+%start program

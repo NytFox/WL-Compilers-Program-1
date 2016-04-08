@@ -32,7 +32,6 @@ extern int assign_next_register();
 %token MAIN
 %token BEGIN_E
 %token END_E
-%token ASG 
 %token EXPO
 %token INT
 %token CHAR
@@ -44,6 +43,7 @@ extern int assign_next_register();
 %token ELSE
 %token CONTINUE
 
+
 %token <stringstuff> AND
 %token <stringstuff> OR
 %token <stringstuff> LT
@@ -52,21 +52,39 @@ extern int assign_next_register();
 %token <stringstuff> NEQ
 %token <stringstuff> LE
 %token <stringstuff> GE
+%token <stringstuff> LEFT_SHIFT
+%token <stringstuff> RIGHT_SHIFT
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
 
 %type <stringstuff> factor 
 %type <stringstuff> term
-%type <stringstuff> expression 
+%type <stringstuff> Expression 
 %type <stringstuff> statement
 %type <stringstuff> parentheses
 %type <stringstuff> declaration
 %type <stringstuff> declaration_item
 %type <stringstuff> arraycontent
 %type <stringstuff> if_content
-%type <stringstuff> sBlock
 %type <stringstuff> comparison
 %type <stringstuff> do_loop_statement
 %type <stringstuff> do_begin
-%type <stringstuff> do_content
 %type <stringstuff> do_end
+%type <stringstuff> if_statement
+%type <stringstuff> Program
+%type <stringstuff> FuncList
+%type <stringstuff> Function
+%type <stringstuff> sBlock
+%type <stringstuff> Parameter_list
+%type <symbolstuff> call_id
+%type <stringstuff> Expression_list
+%type <stringstuff> ShiftTerm
+%type <stringstuff> BitTerm
+%type <stringstuff> Shift_operation
+%type <stringstuff> bit_operation
+
+
+
+
+
+

@@ -1,45 +1,199 @@
-%start statement_list 
+%start Program 
 
 %%
+
+
+Program : declaration FuncList
+		{
+			cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n"<<endl;
+		}
+		| FuncList
+		{
+			cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n"<<endl;
+		}
+		;
+
+FuncList : Function FuncList
+		{
+
+		}
+		| Function 
+		{
+
+		}
+		;
+
+
+
+Function :  MAIN  '(' ')' ':' VOID sBlock
+			{
+				cout << "main()\n"<<endl;
+			}
+			| ID '(' Parameter_list ')'
+			{
+				
+			}
+			| ID '(' ')'
+			{
+
+
+			}
+
+			| ID '(' Parameter_list ')' ':' type declaration sBlock
+			{
+
+
+			}
+			;
+
+Parameter_list : call_id ',' Parameter_list
+			{
+
+			}
+			| call_id
+			{
+				
+			}
+			;
+
+//************************ Variable Declaration **************************//
+
+declaration : declaration_item ';' declaration
+			{
+				//printf("\nSeen sequent declaration;\n\n");
+			}
+			| declaration_item
+			{
+				//printf("\nSeen single declaration;\n\n");
+			}
+			;
+
+declaration_item : type ID '[' arraycontent ']'
+			{
+				//printf("\nSeen array declaration;\n\n");
+			}
+			| type ID
+			{
+				//printf("\nSeen type declaration;\n\n");
+			}
+			;
+
+arraycontent : INTLITERAL ',' arraycontent
+			{
+				//printf("\nSeen multi-dimention array declaration;\n\n");
+			}
+			| INTLITERAL
+			{
+				//printf("\nSeen 1D array declaration;\n\n");
+			}
+			;
+
+
+type		: INT
+			| CHAR
+			| LONG
+			;
+
+
+//************************ sBlock **************************//
+sBlock : BEGIN_E declaration statement_list END_E
+		{
+			//printf("\nEnter sBlock\n\n");
+		}
+		;
+
+
+//************************ statment list **************************//
+
 statement_list  :  statement_list statement
                 | statement
                 ;
 
-statement  : MAIN  '(' ')' ':' VOID BEGIN_E
-			{
-				cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nmain()\n{\ninitstack();\n"<<endl;
-			}
-			;
-statement  : BEGIN_E
+//************************ expression list **************************//           
+Expression_list : Expression ',' Expression_list
 		{
-			//printf("\nSeen BEGIN\n\n");
-			cout << "{\n"<<endl;
+
+		}
+		| Expression
+		{
+
+		}
+		| /* empty */
+		{
+
 		}
 		;
 
-statement  : END_E 
+//************************ function call **************************//
+
+statement : ID '(' Expression_list ')'
+			{
+				call_function($1->name, $3);
+			}
+			;
+
+
+//************************ expression call **************************//
+
+statement  : call_id '=' Expression
+		{ 
+			//printf("\nSeen EXP PASSING\n\n");
+
+		    cout<< "r"<<$1->offset <<" = "<< $3 << ";"<<endl;
+
+		}
+  		;
+//************************ Do Loop Statement **************************//
+statement : do_loop_statement
+			{
+				//printf("\nSeen Do Loop;\n\n");
+			}
+			;
+
+do_loop_statement : do_begin statement_list do_end
+			{
+
+			}
+			;
+
+do_begin : DO INTLITERAL ID '=' do_list
+			{
+					//printf("\nSeen Do BEGIN;\n\n");
+			}
+			;
+
+do_list : Expression ',' Expression
 		{
-			//printf("\nSeen END;\n\n"); 
-			cout << "}\n"<<endl;
+
+		}
+		| Expression ',' Expression ',' Expression
+		{
+
 		}
 		;
+
+do_end : INTLITERAL CONTINUE
+			{
+				//printf("\nSeen Do End;\n\n");
+			}
+			;
 
 //************************ IF Statement **************************//
-statement : IF '(' if_content ')' BEGIN_E sBlock END_E ELSE BEGIN_E sBlock END_E
-			{
-
-			}
-			| IF '(' if_content ')' BEGIN_E sBlock END_E
+statement : if_statement
 			{
 
 			}
 			;
-			
-sBlock : statement
-		{
 
-		}
-		;
+if_statement : IF '(' if_content ')' sBlock ELSE sBlock
+			{
+
+			}
+			| IF '(' if_content ')' sBlock
+			{
+
+			}
+			;
 
 if_content : comparison AND if_content
 			{
@@ -55,129 +209,59 @@ if_content : comparison AND if_content
 			}
 			;
 
-comparison : expression '.' GT '.' expression
+comparison : Expression '.' GT '.' Expression
 			{
 
 			}
-			|expression '.' LT '.' expression
+			|Expression '.' LT '.' Expression
 			{
 
 			}
-			|expression '.' GE '.' expression
+			|Expression '.' GE '.' Expression
 			{
 
 			}
-			|expression '.' LE '.' expression
+			|Expression '.' LE '.' Expression
 			{
 
 			}
-			|expression '.' EQ '.' expression
+			|Expression '.' EQ '.' Expression
 			{
 
 			}
-			|expression '.' NEQ '.' expression
-			{
-
-			}
-			;
-
-
-//************************ Variable Declaration **************************//
-statement : declaration
-			{
-
-			}
-			;
-			
-declaration : declaration_item ';' declaration
-			{
-				printf("\nSeen sequent declaration;\n\n");
-			}
-			| declaration_item
-			{
-				printf("\nSeen single declaration;\n\n");
-			}
-			;
-
-declaration_item : type ID '[' arraycontent ']'
-			{
-				printf("\nSeen array declaration;\n\n");
-			}
-			| type ID
-			{
-				printf("\nSeen type declaration;\n\n");
-			}
-			;
-
-arraycontent: INTLITERAL ',' arraycontent
-			{
-				printf("\nSeen multi-dimention array declaration;\n\n");
-			}
-			| INTLITERAL
-			{
-				printf("\nSeen 1D array declaration;\n\n");
-			}
-			;
-
-
-type		: INT
-			| CHAR
-			| LONG
-			;
-
-//************************ Do Loop Statement **************************//
-statement : do_loop_statement
-			{
-
-			}
-			;
-
-do_loop_statement : do_begin do_content do_end 
-			{
-
-			}
-			;
-
-do_begin : DO INTLITERAL ID '=' INTLITERAL ',' INTLITERAL ',' INTLITERAL
-			{
-
-			}
-			;
-
-do_content : statement
-			{
-
-			}
-			;
-
-do_end : INTLITERAL CONTINUE
+			|Expression '.' NEQ '.' Expression
 			{
 
 			}
 			;
 
 
-			
 
-//************************ Function call **************************//
-statement  : ID '(' ID ')' ';'
+//************************ Expression Calculation **************************//
+
+
+Expression : Expression bit_operation BitTerm
 		{
-			//printf("\nSeen FUNCTION\n\n"); 
-			function_call($1,$3);
+
+		}
+		| BitTerm
+		{
+
+		}
+		;
+
+BitTerm : BitTerm Shift_operation ShiftTerm
+		{
+
+		}
+		| ShiftTerm
+		{
+
 		}
 		;
 
 
-//************************ Expression Calculation **************************//
-statement  : ID ASG expression ';' 
-		{ 
-			//printf("\nSeen EXP PASSING\n\n");
-		    cout<< "r"<<$1->offset <<" = "<< $3 << ";"<<endl;
-
-		}
-  		;
-
-expression : expression '+' term
+ShiftTerm : ShiftTerm '+' term
 		{
 		    //printf("\nSeen ADD_OP\n\n"); 
 		    char *rd = new_registrator();
@@ -185,9 +269,10 @@ expression : expression '+' term
 		    $$ = rd;
 
 		}
-		| expression '-' term
+		| ShiftTerm '-' term
 		{
-		    // printf("\nSeen ADD_OP\n\n"); 
+		    //printf("\nSeen ADD_OP\n\n"); 
+
 		   	char *rd = new_registrator();
 		    //cout<< rd <<" = " << $1 << " - "<< $3<<";"<<endl;
 		    cal_operation('-',$1,$3,rd);
@@ -196,21 +281,24 @@ expression : expression '+' term
 		}
 	    | term
 		{ 
-		    // printf("Seen Term \n"); 
+		     //printf("Seen Term \n"); 
+
 		    $$ = $1;
 		}
    		;
 
 term : 	term '*' factor 
 		{
-		    // printf("\nSeen MUL_OP \n\n"); 
+		     //printf("\nSeen MUL_OP \n\n"); 
+
 		    char *rd = new_registrator();
 		    cal_operation('*',$1,$3,rd);
 		    $$ = rd;
 		}
 		| term '/' factor 
 		{
-		    // printf("\nSeen MUL_OP \n\n"); 
+		     //printf("\nSeen MUL_OP \n\n"); 
+
 		    char *rd = new_registrator();
 		    cal_operation('/',$1,$3,rd);
 		    $$ = rd;
@@ -218,6 +306,7 @@ term : 	term '*' factor
 	   	| factor
 		{ 
 		    // printf("Seen: FACTOR \n"); 
+
 		    $$ = $1;
 		}
    		;
@@ -225,6 +314,7 @@ term : 	term '*' factor
 factor 	: factor EXPO parentheses
 		{
 			// printf("Seen: EXPO_OP\n");
+
 			char *rd = new_registrator(); 	
 		    cout<< rd <<" = "<<Calc_exponential($1,$3)<<";"<<endl;
 			$$ = rd;
@@ -232,18 +322,20 @@ factor 	: factor EXPO parentheses
 		| parentheses
 		{
 			// printf("\nSeen: PARENTHESES\n\n"); 
+
 			$$ = $1;
 		}
 		;
 
-parentheses : '(' expression ')' 
+parentheses : '(' Expression ')' 
 		{ 
 			$$ = $2;	
 		}
-		| ID
+		| call_id
 		{
 			// cout<<"Seen ID->"<<$1->name<<endl;
-			$$ = start_expression_string($1);
+
+			$$ = id_distinction(); // todo ; return function name or create variable (in global data)
 		}
 		| INTLITERAL
 		{
@@ -251,6 +343,41 @@ parentheses : '(' expression ')'
 			$$ = get_number($1);
 		}
 		;
+
+call_id : ID '[' Expression_list ']'
+		{
+			$$ = $3;
+		}
+		| ID
+		{
+			//cout << $1->name << endl;
+			$$ = $1;
+		}
+		;
+
+Shift_operation : LEFT_SHIFT
+				{
+
+				}
+				| RIGHT_SHIFT
+				{
+
+				}
+				;
+
+bit_operation : '^'
+			{
+
+			}
+			| '|'
+			{
+
+			}
+			| '&'
+			{
+
+			}
+			;
 
 %%
 
@@ -316,13 +443,6 @@ int yyerror(const char *s)
         return 0;
 }
 
-void function_call(Symbol *func, Symbol *para)
-{
-	if(strcmp(func->name,"output")==0)
-	{
-		cout<<"printInt(r"<<para->offset<<");"<<endl;
-	}
-}
 
 char *Calc_exponential(const char *r1, const char *r2)
 {
@@ -436,9 +556,43 @@ void cal_operation(char oprator,const char *left, const char *right, const char 
 }
 
 
+void function_call(Symbol *func, Symbol *para)
+{
+	if(strcmp(func->name,"output")==0)
+	{
+		cout<<"printInt(r"<<para->offset<<");"<<endl;
+	}
+	else
+	if(strcmp(func->name,"printi")==0)
+	{
+		cout<<"printInt(r"<<para->offset<<");"<<endl;
+	}
+	else
+	if(strcmp(func->name,"printLine")==0)
+	{
+		cout<<"printLine;"<<endl;
+	}
+}
 
 
-
+void call_function(Symbol *func,char *para_list)
+{
+	// system functions
+	if(strcmp(func->name,"printi")==0)
+		{
+			cout<<"printInt(r"<<para_list<<");"<<endl;
+		}
+	else
+	if(strcmp(func->name,"printLine")==0)
+		{
+			cout<<"printline();"<<endl;
+		}
+	// custom functions
+	else
+	{
+		cout<<func->name<<para_list<<";"<<endl;
+	}
+}
 
 
 
