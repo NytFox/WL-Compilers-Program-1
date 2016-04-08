@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> origin/master
 %start Program 
 
 %%
@@ -28,10 +24,6 @@ FuncList : Function FuncList
 		;
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 Function :  MAIN  '(' ')' ':' VOID sBlock
 			{
 				cout << "main()\n"<<endl;
@@ -43,10 +35,6 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 			| ID '(' ')'
 			{
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
 			}
 
 			| ID '(' Parameter_list ')' ':' type declaration sBlock
@@ -62,11 +50,7 @@ Parameter_list : call_id ',' Parameter_list
 			}
 			| call_id
 			{
-<<<<<<< HEAD
-				
-=======
-			
->>>>>>> origin/master
+
 			}
 			;
 
@@ -123,7 +107,6 @@ statement_list  :  statement_list statement
                 | statement
                 ;
 
-<<<<<<< HEAD
 //************************ expression list **************************//           
 Expression_list : Expression ',' Expression_list
 		{
@@ -139,24 +122,14 @@ Expression_list : Expression ',' Expression_list
 		}
 		;
 
-=======
->>>>>>> origin/master
 //************************ function call **************************//
 
 statement : ID '(' Expression_list ')'
 			{
-<<<<<<< HEAD
 				call_function($1->name, $3);
 			}
 			;
 
-
-=======
-
-			}
-			;
-
->>>>>>> origin/master
 //************************ expression call **************************//
 
 statement  : call_id '=' Expression
