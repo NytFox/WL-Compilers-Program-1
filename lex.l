@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Digit		[0-9]
 Letter		[a-zA-Z]
 IntLit		{Digit}+
@@ -113,3 +114,4 @@ int assign_next_register()
 	register_number = (register_number + 1) % 28;
 	return register_number;
 }
+

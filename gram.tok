@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 %{
 extern "C"
 {
@@ -82,9 +83,3 @@ extern int assign_next_register();
 %type <stringstuff> BitTerm
 %type <stringstuff> Shift_operation
 %type <stringstuff> bit_operation
-
-
-
-
-
-

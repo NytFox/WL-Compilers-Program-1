@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 %start Program 
 
 %%
@@ -567,9 +568,4 @@ void function_call(Symbol *func, Symbol *para)
 		cout<<"printLine;"<<endl;
 	}
 }
-
-
-
-
-
 
