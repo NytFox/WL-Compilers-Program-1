@@ -21,9 +21,9 @@ int assign_next_register();
 %%
 main 								{ return (MAIN);	}
 
-begin								{ return (BEGIN_E);	}
+begin								{ return (BEGIN_E); enter_scope();	}
 
-end									{ return (END_E);	}					
+end									{ return (END_E);	leave_scope();	}					
 
 int									{ fflush(stdout); return (INT);	}
 char								{ fflush(stdout); return (CHAR);	}
@@ -100,6 +100,16 @@ void process_id()
 	yylval.symbolstuff = t;
         /*printf("in process get id %s\n",yylval.symbolstuff->name);*/
 
+}
+
+void enter_scope()
+{
+	new_table->Enter_new_scope();
+}
+
+void back_scope()
+{
+	new_table->Leave_current_scope();
 }
 
 int assign_next_register()

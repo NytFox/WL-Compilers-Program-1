@@ -151,6 +151,7 @@ Symbol::Symbol(const char *s){
     strcpy(name,s);
     next_bucket=NULL;
     offset = -1;
+    array_location = -1;
 }
 
 Symbol* Symbol::Give_attributes(const char* t,const char* v, int offset){

@@ -55,7 +55,7 @@ extern int assign_next_register();
 %token <stringstuff> LEFT_SHIFT
 %token <stringstuff> RIGHT_SHIFT
 %token <intstuff> INTLITERAL
-%token <symbolstuff> ID
+%token <stringstuff> ID
 
 %type <stringstuff> factor 
 %type <stringstuff> term
@@ -64,7 +64,7 @@ extern int assign_next_register();
 %type <stringstuff> parentheses
 %type <stringstuff> declaration
 %type <stringstuff> declaration_item
-%type <stringstuff> arraycontent
+%type <intstuff> arraycontent
 %type <stringstuff> if_content
 %type <stringstuff> comparison
 %type <stringstuff> do_loop_statement
@@ -82,3 +82,4 @@ extern int assign_next_register();
 %type <stringstuff> BitTerm
 %type <stringstuff> Shift_operation
 %type <stringstuff> bit_operation
+%type <stringstuff> Program_Initialization

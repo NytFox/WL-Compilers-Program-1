@@ -31,6 +31,7 @@ public:
 	*/
 	const char* type;							// variable type
 	const char* value;						// variable value
+	int array_location;
 };
 
 class Scope {							// one hashtable for one scope

@@ -1,32 +1,40 @@
-%start Program 
+%start Program_Initialization 
 
 %%
-
+Program_Initialization : Program
+		{
+			cout<<"int r0, r1, r2, r3, r4, r5, r6, r7;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_variable[1024];\nchar char_variable[1024];\n";
+			cout<< $1;
+		}
+		;
 
 Program : declaration FuncList
 		{
-			cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n"<<endl;
+			strcat($1,$2);
+			$$ = $1;
 		}
 		| FuncList
 		{
-			cout << "int r0, r1, r2, r3, r4, r5, r6, r7, r8,r9,r10,r11,r12;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\n"<<endl;
+			$$ = $1;
 		}
 		;
 
 FuncList : Function FuncList
 		{
-
+			strcat($1,$2);
+			$$ = $1;
 		}
 		| Function 
 		{
-
+			$$ = $1;
 		}
 		;
 
 
 Function :  MAIN  '(' ')' ':' VOID sBlock
 			{
-				cout << "main()\n"<<endl;
+				char *return_string = "main()\n";
+				$$ =  return_string;
 			}
 			| ID '(' Parameter_list ')'
 			{
@@ -63,26 +71,40 @@ declaration : declaration_item ';' declaration
 			| declaration_item
 			{
 				//printf("\nSeen single declaration;\n\n");
+
 			}
 			;
 
 declaration_item : type ID '[' arraycontent ']'
 			{
 				//printf("\nSeen array declaration;\n\n");
+				assign_array_info($1, $2, $4*4);
 			}
 			| type ID
 			{
 				//printf("\nSeen type declaration;\n\n");
+
+				//cout << $1->name << endl;
+
+				//$$ = assign_type($1,$2); // todo, give type to corresponding content in symbol table
 			}
 			;
+
+
+
+
 
 arraycontent : INTLITERAL ',' arraycontent
 			{
 				//printf("\nSeen multi-dimention array declaration;\n\n");
+				$$ = $1*$3;
+
 			}
 			| INTLITERAL
 			{
 				//printf("\nSeen 1D array declaration;\n\n");
+
+				$$ = $1;
 			}
 			;
 
@@ -357,12 +379,11 @@ parentheses : '(' Expression ')'
 
 call_id : ID '[' Expression_list ']'
 		{
-			$$ = $3;
+
 		}
 		| ID
 		{
-			//cout << $1->name << endl;
-			$$ = $1;
+		
 		}
 		;
 
@@ -602,4 +623,11 @@ void call_function(Symbol *func,char *para_list)
 	{
 		cout<<func->name<<para_list<<";"<<endl;
 	}
+}
+
+void assign_arraylocation(char *type, Symbol *id,int size)
+{
+	static int size_level;
+	id->array_location = size_level;
+	size_level += size;
 }
