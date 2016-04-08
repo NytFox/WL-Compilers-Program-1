@@ -178,57 +178,120 @@ do_end : INTLITERAL CONTINUE
 //************************ IF Statement **************************//
 statement : if_statement
 			{
-
+				cout<<$1<<endl;
 			}
 			;
 
 if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 			{
-
+				int top,med,bot;
+				top=stack.pop();
+				med=stack.pop();
+				bot=stack.pop();
+				cout<<"if("<<$2<<") goto L"<<med<<endl;
+				cout<<"L"<<top<<":"<<endl;
+				cout<<$5<<endl;
+				cout<<"goto L"<<bot<<endl;
+				cout<<"L"<<med<<":"<<endl;
+				cout<<$3<<endl;
+				cout<<"L"<<bot<<":"<<endl;
 			}
 			| IF '(' if_content ')' sBlock
 			{
-
+				int top,med,bot;
+				top=stack.pop();
+				med=stack.pop();
+				bot=stack.pop();
+				cout<<"if("<<$2<<") goto L"<<med<<endl;
+				cout<<"L"<<top<<":"<<endl;
+				cout<<"goto L"<<bot<<endl;
+				cout<<"L"<<med<<":"<<endl;
+				cout<<$3<<endl;
+				cout<<"L"<<bot<<":"<<endl;
 			}
 			;
 
 if_content : comparison AND if_content
 			{
-
+				int top,med,bot;
+				top=stack.pop();
+				med=stack.pop();
+				bot=stack.pop();
+				cout<<"  if("<<revise($3)<<") goto L"<<top<<endl;
+				stack.push(bot);
+				stack.push(med);
+				stack.push(top);	
+				$$=$1;  	 
 			}
-			|comparison OR if_content
+			|comparison OR if_content        
 			{
-
+				int top,med,bot;
+				top=stack.pop();
+				med=stack.pop();
+				bot=stack.pop();
+				cout<<"  if("<<$3<<") goto L"<<med<<endl;
+				stack.push(bot);
+				stack.push(med);
+				stack.push(top);	
+				$$=$1;				
 			}
 			| comparison
 			{
-
+				$$=$1;
+				stack.push(Label);
+				stack.push(Label+1);
+				stack.push(Label+2);
+				Label+=3;
 			}
 			;
 
 comparison : Expression '.' GT '.' Expression
 			{
-
+				char tmp[10000];
+				strcpy(tmp,$1);
+				strcat(tmp,">");
+				strcat(tmp,$3);
+				$$=tmp;
 			}
 			|Expression '.' LT '.' Expression
 			{
-
+				char tmp[10000];
+				strcpy(tmp,$1);
+				strcat(tmp,"<");
+				strcat(tmp,$3);
+				$$=tmp;
 			}
 			|Expression '.' GE '.' Expression
 			{
-
+				char tmp[10000];
+				strcpy(tmp,$1);
+				strcat(tmp,">=");
+				strcat(tmp,$3);
+				$$=tmp;
 			}
 			|Expression '.' LE '.' Expression
 			{
-
+				char tmp[10000];
+				strcpy(tmp,$1);
+				strcat(tmp,"<=");
+				strcat(tmp,$3);
+				$$=tmp;
 			}
 			|Expression '.' EQ '.' Expression
 			{
-
+				char tmp[10000];
+				strcpy(tmp,$1);
+				strcat(tmp,"==");
+				strcat(tmp,$3);
+				$$=tmp;
 			}
 			|Expression '.' NEQ '.' Expression
 			{
-
+				char tmp[10000];
+				strcpy(tmp,$1);
+				strcat(tmp,"!=");
+				strcat(tmp,$3);
+				$$=tmp;
 			}
 			;
 
@@ -602,4 +665,40 @@ void call_function(Symbol *func,char *para_list)
 	{
 		cout<<func->name<<para_list<<";"<<endl;
 	}
+}
+char *revise(char* str)
+{
+	
+	string::size_type position=0
+	position=str.find(">");
+	if(position!=string::npos){
+		str.replace(position,1,"<=");
+		return str;
+	}
+	position=str.find("<");
+	if(position!=string::npos){
+		str.replace(position,1,">=");
+		return str;
+	}
+	position=str.find(">=");
+	if(position!=string::npos){
+		str.replace(position,1,"<");
+		return str;
+	}
+	position=str.find("<=");
+	if(position!=string::npos){
+		str.replace(position,1,">");
+		return str;
+	}
+	position=str.find("!=");
+	if(position!=string::npos){
+		str.replace(position,1,"==");
+		return str;
+	}
+	position=str.find("==");
+	if(position!=string::npos){
+		str.replace(position,1,"!=");
+		return str;
+	}
+
 }
