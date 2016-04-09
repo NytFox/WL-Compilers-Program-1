@@ -15,6 +15,8 @@ extern "C"
 using namespace std;
 void process_id();
 int assign_next_register();
+void enter_scope();
+void leave_scope();
 
 %}
 
@@ -83,7 +85,8 @@ void process_id()
 	*/
 
 	Symbol *t;
-	if(!(t = new_table -> Search_symbol(yytext)))
+	t = new_table -> Search_symbol(yytext);
+	if(!t)
 	{
 	   /*  a symbol table entry has a character string "key" taken
                from yytext, and a register "number", in the range 4-31.  */

@@ -31,6 +31,7 @@ public:
 	*/
 	const char* type;							// variable type
 	const char* value;						// variable value
+	int if_array;
 	int array_location;
 };
 

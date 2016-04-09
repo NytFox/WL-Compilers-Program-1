@@ -4,27 +4,43 @@ extern "C"
 	int yylex(void);
 	int yyparse(void);
 }
+
 #include "symtab_class_header.h"
 #include <ctype.h>
-//original
+#include <stack> 
+#include <sstream> // for ostringstream
 char *start_expression_string(Symbol *symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
 char *new_registrator();
-void function_call(Symbol *func, Symbol *para);
+char* function_call(Symbol *func, Symbol *para);
 char *Calc_exponential(const char *r1,const char *r2);
 int assign_next_lable();
 char *get_number(int num);
 bool is_number(const char *string);
-void cal_operation(char oprator,const char *left, const char *right,const char *target);
+char* cal_operation(char oprator,const char *left, const char *right,const char *target);
 extern int assign_next_register();
+char *revise(char* str);
+void push_array_target_location(char *location );
+void assign_array_info(char *type, Symbol *id,int size);
+void assign_variable_type(char *type,Symbol *id);
+char* call_function(Symbol *func,char *para_list);
+void pop_array_target_location();
+char* string_connect(char *a, char *b);
+void empty_string_buffer();
+char* copy_buffer();
+//global variables
+stack<char *> array_target_location;
+stack<int> if_stack;
+char string_buffer[1000];
+int Label;
 %}
 
 %union 
 {
         int intstuff;
-        const char *stringstuff;
+        char *stringstuff;
         Symbol* symbolstuff;  
 }
 
@@ -33,9 +49,9 @@ extern int assign_next_register();
 %token BEGIN_E
 %token END_E
 %token EXPO
-%token INT
-%token CHAR
-%token LONG
+%token <stringstuff> INT
+%token <stringstuff> CHAR
+%token <stringstuff> LONG
 %token ENUM
 %token VOID
 %token DO
@@ -55,7 +71,7 @@ extern int assign_next_register();
 %token <stringstuff> LEFT_SHIFT
 %token <stringstuff> RIGHT_SHIFT
 %token <intstuff> INTLITERAL
-%token <stringstuff> ID
+%token <symbolstuff> ID
 
 %type <stringstuff> factor 
 %type <stringstuff> term
@@ -83,3 +99,5 @@ extern int assign_next_register();
 %type <stringstuff> Shift_operation
 %type <stringstuff> bit_operation
 %type <stringstuff> Program_Initialization
+%type <stringstuff> type
+%type <stringstuff> statement_list
