@@ -33,6 +33,7 @@ char* copy_buffer();
 //global variables
 stack<char *> array_target_location;
 stack<int> if_stack;
+stack<int> do_stack;
 char string_buffer[1000];
 int Label;
 char empty_label[]="";
