@@ -34,7 +34,6 @@ FuncList : Function FuncList
 Function :  MAIN  '(' ')' ':' VOID sBlock
 			{
 				char return_string[]="main()\n";
-				cout<<"TEST FUNCTION:"<<$6<<endl;
 				$$ = string_connect(return_string,$6);
 			}
 			| ID '(' Parameter_list ')'
@@ -80,12 +79,13 @@ declaration_item : type ID '[' arraycontent ']'
 			{
 				//printf("\nSeen array declaration;\n\n");
 				assign_array_info($1, $2, $4);
+				$$ = empty_label;
 			}
 			| type ID
 			{
 				//printf("\nSeen type declaration;\n\n");
-
 				assign_variable_type($1,$2); // todo, give type to corresponding content in symbol table
+				$$ = empty_label;
 			}
 			;
 
@@ -110,10 +110,19 @@ arraycontent : INTLITERAL ',' arraycontent
 
 type		: INT
 			{
-
+				char integer[]="int";
+				$$ = integer;
 			}
 			| CHAR
+			{
+				char charactor[]="char";
+				$$ = charactor;
+			}
 			| LONG
+			{
+				char long_integer[]="long";
+				$$ = long_integer;
+			}
 			;
 
 
@@ -134,7 +143,9 @@ sBlock : BEGIN_E declaration statement_list END_E
 			char *return_string;
 			char left_bracket[] = "{\n";
 			char right_bracket[] = "}\n";
+
 			return_string = string_connect(left_bracket,$2);
+			//cout<<"TEST return string: "<<return_string<<endl;
 			return_string = string_connect(return_string,right_bracket);
 			$$ = return_string;
 		}
@@ -174,6 +185,7 @@ Expression_list : Expression ',' Expression_list
 			char *return_string;
 			char comma[] = ",";
 			return_string = string_connect($1,comma);
+
 			return_string = string_connect(return_string,$3);
 			$$ = return_string;
 		}
@@ -201,8 +213,8 @@ statement  : call_id '=' Expression
 		{ 
 			//printf("\nSeen EXP PASSING\n\n");
 		    //cout<< "r"<<$1->offset <<" = "<< $3 << ";"<<endl;
-
 			sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
+
 			char *return_string = copy_buffer();
 			empty_string_buffer();
 
@@ -334,10 +346,9 @@ if_content : comparison AND if_content
 			| comparison
 			{
 				$$=$1;
-				if_stack.push(Label);
-				if_stack.push(Label+1);
-				if_stack.push(Label+2);
-				Label+=3;
+				if_stack.push(assign_next_lable());
+				if_stack.push(assign_next_lable());
+				if_stack.push(assign_next_lable());
 			}
 			;
 
@@ -665,11 +676,14 @@ char *Calc_exponential(const char *r1, const char *r2)
 			char *rt_i = new_registrator();
 			cout<<rt_i<<"= 0;"<<endl;
 			char *rx = new_registrator();
-			cout<<rx<<"= 1;"<<endl;
+
+			/*cout<<rx<<"= 1;"<<endl;
 			cout<<"L"<<l<<":"<<endl;
 			cout<<rx<<" = "<<rx<<"*"<<r1<<";"<<endl;
 			cout<<rt_i<<" = "<<rt_i<<" + 1;"<<endl;
-			cout<<"if("<<r2<<">"<<rt_i<<") goto L"<<l<<";"<<endl;
+			cout<<"if("<<r2<<">"<<rt_i<<") goto L"<<l<<";"<<endl;*/
+			sprintf(string_buffer + strlen(string_buffer),"%s= 0;\n%s= 1;\nL%d:\n%s = %s*%s;\n%s = %s + 1;\nif(%s>%s) goto L%d;\n",rt_i,rx,l,rx,rx,r1,rt_i,rt_i,r2,rt_i,l);
+
 			return rx;
 }
 
@@ -718,28 +732,31 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 
 		char *rd_1 = new_registrator();
 		char *rd_2 = new_registrator();
-		cout<< rd_1 <<" = " << a <<endl;
+		/*cout<< rd_1 <<" = " << a <<endl;
 		cout<< rd_2 <<" = " << b <<endl;
-		cout<< target << " = ";
+		cout<< target << " = ";*/
+		sprintf(string_buffer + strlen(string_buffer),"%s = %d\n%s = %d\n%s = ",rd_1,a,rd_2,b,target);
+
 		switch(oprator)
 		{
 			case '+':{
 				// cout<<rd_1<<"+"<<rd_2;
-				strcat(string_buffer,rd_1);
-				strcat(string_buffer,"+");
-				strcat(string_buffer,rd_2);
+				sprintf(string_buffer + strlen(string_buffer),"%s+%s",rd_1,rd_2);
 				break;
 			}
 			case '-':{
-				cout<<rd_1<<"-"<<rd_2;
+				//cout<<rd_1<<"-"<<rd_2;
+				sprintf(string_buffer + strlen(string_buffer),"%s-%s",rd_1,rd_2);
 				break;
 			}
 			case '*':{
-				cout<<rd_1<<"*"<<rd_2;
+				//cout<<rd_1<<"*"<<rd_2;
+				sprintf(string_buffer + strlen(string_buffer),"%s*%s",rd_1,rd_2);
 				break;
 			}
 			case '/':{
-				cout<<rd_1<<"/"<<rd_2;
+				//cout<<rd_1<<"/"<<rd_2;
+				sprintf(string_buffer + strlen(string_buffer),"%s/%s",rd_1,rd_2);
 				break;
 			}
 			default: break;
@@ -747,49 +764,37 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 	}
 	else
 	{
-		cout<< target << " = ";
+		//cout<< target << " = ";
+		sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
+
 		//cout<< "T2"<<endl;
 		switch(oprator)
 		{
 			case '+':{
-				cout<<left<<"+"<<right;
+				//cout<<left<<"+"<<right;
+				sprintf(string_buffer + strlen(string_buffer),"%s+%s",left,right);
 				break;
 			}
 			case '-':{
-				cout<<left<<"-"<<right;
+				//cout<<left<<"-"<<right;
+				sprintf(string_buffer + strlen(string_buffer),"%s-%s",left,right);
 				break;
 			}
 			case '*':{
-				cout<<left<<"*"<<right;
+				//cout<<left<<"*"<<right;
+				sprintf(string_buffer + strlen(string_buffer),"%s*%s",left,right);
 				break;
 			}
 			case '/':{
-				cout<<left<<"/"<<right;
+				//cout<<left<<"/"<<right;
+				sprintf(string_buffer + strlen(string_buffer),"%s/%s",left,right);
 				break;
 			}
 			default: break;
 		}
 	}
-	cout<<";"<<endl;
-}
-
-
-char* function_call(Symbol *func, Symbol *para)
-{
-	if(strcmp(func->name,"output")==0)
-	{
-		cout<<"printInt(r"<<para->offset<<");"<<endl;
-	}
-	else
-	if(strcmp(func->name,"printi")==0)
-	{
-		cout<<"printInt(r"<<para->offset<<");"<<endl;
-	}
-	else
-	if(strcmp(func->name,"printLine")==0)
-	{
-		cout<<"printLine;"<<endl;
-	}
+	//cout<<";"<<endl;
+	sprintf(string_buffer + strlen(string_buffer),";");
 }
 
 char* call_function(Symbol *func,char *para_list)
@@ -797,17 +802,20 @@ char* call_function(Symbol *func,char *para_list)
 	// system functions
 	if(strcmp(func->name,"printi")==0)
 		{
-			cout<<"printInt(r"<<para_list<<");"<<endl;
+			//cout<<"printInt(r"<<para_list<<");"<<endl;
+			sprintf(string_buffer + strlen(string_buffer),"printInt(%s);\n",para_list);
 		}
 	else
 	if(strcmp(func->name,"printLine")==0)
 		{
-			cout<<"printline();"<<endl;
+			//cout<<"printline();"<<endl;
+			sprintf(string_buffer + strlen(string_buffer),"printline();\n");
 		}
 	// custom functions
 	else
 	{
-		cout<<func->name<<para_list<<";"<<endl;
+		//cout<<func->name<<para_list<<";"<<endl;
+		sprintf(string_buffer + strlen(string_buffer),"%s(%s);\n",func->name,para_list);
 	}
 }
 
@@ -818,17 +826,29 @@ void assign_variable_type(char *type,Symbol *id)
 
 char* string_connect(char *a, char *b)
 {
-	size_t newlen = strlen(a) + strlen(b);
-	char *r = new char(newlen+1);
-	strcpy(r, a);
+	/*cout<<"TEST a: "<<a<<endl;
+	cout<<"TEST b: "<<b<<endl;
+	cout<<"TEST l1: "<<strlen(a)<<endl;
+	cout<<"TEST l2: "<<strlen(b)<<endl;*/
+	int newlen = strlen(a) + strlen(b);
+	/*cout<<"TEST newlen: "<<newlen<<endl;*/
+	char *r =  new char[newlen+1];
+
+/*	strcpy(r, a);
+	cout<<"TEST copy: "<<r<<endl;
 	strcat(r, b);
+	cout<<"TEST cat: "<<r<<endl;*/
+
+	sprintf(r,"%s%s",a,b);
+	/*cout<<"TEST output length: "<<strlen(r)<<endl;
+	cout<<"TEST output: "<<r<<endl;*/
 	return r;
 }
 
 char* copy_buffer()
 {
 	size_t newlen = strlen(string_buffer);
-	char *r = new char(newlen+1);
+	char *r = new char[newlen+1];
 	strcpy(r, string_buffer);
 	return r;
 }
@@ -898,6 +918,6 @@ char *revise(char* str)
 	if(position!=string::npos){
 		str.replace(position,1,"!=");
 		return str;
-	}*/
-
+	}
+*/
 }
