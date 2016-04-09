@@ -129,10 +129,10 @@ type		: INT
 //************************ sBlock **************************//
 sBlock : BEGIN_E declaration statement_list END_E
 		{
-			//printf("\nEnter sBlock\n\n");
+			
 			char *return_string;
-			char left_bracket[] = "{\n";
-			char right_bracket[] = "}\n";
+			char left_bracket[] = "\n{\n";
+			char right_bracket[] = "\n}\n";
 			return_string = string_connect(left_bracket,$2);
 			return_string = string_connect(return_string,$3);
 			return_string = string_connect(return_string,right_bracket);
@@ -140,9 +140,11 @@ sBlock : BEGIN_E declaration statement_list END_E
 		}
 		| BEGIN_E statement_list END_E
 		{
+			printf("\nEnter sBlock\n\n");
+			
 			char *return_string;
-			char left_bracket[] = "{\n";
-			char right_bracket[] = "}\n";
+			char left_bracket[] = "\n{\n";
+			char right_bracket[] = "\n}\n";
 
 			return_string = string_connect(left_bracket,$2);
 			//cout<<"TEST return string: "<<return_string<<endl;
@@ -152,8 +154,8 @@ sBlock : BEGIN_E declaration statement_list END_E
 		| BEGIN_E declaration END_E
 		{
 			char *return_string;
-			char left_bracket[] = "{\n";
-			char right_bracket[] = "}\n";
+			char left_bracket[] = "\n{\n";
+			char right_bracket[] = "\n}\n";
 			return_string = string_connect(left_bracket,$2);
 			return_string = string_connect(return_string,right_bracket);
 			$$ = return_string;
@@ -241,7 +243,8 @@ do_loop_statement : do_begin statement_list do_end
 do_begin : DO INTLITERAL ID '=' do_list
 			{
 				int index;
-				index=do_stack.pop();	
+				index=do_stack.top();	
+				do_stack.pop();
 				cout<<"L"<<index<<":"<<endl;
 			}
 			;
@@ -292,12 +295,11 @@ do_list : Expression ',' Expression
 do_end : INTLITERAL CONTINUE
 			{
 				char tmp[10000];
-				
+				int index = assign_next_lable();
 				do_stack.push(index);
 				strcpy(tmp,"goto L");
 				strcat(tmp,get_number(index));
 				strcat(tmp,";");
-				index+=1; 
 				$$=tmp;
 			}
 			;
@@ -334,6 +336,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 			}
 			| IF '(' if_content ')' sBlock
 			{
+				cout<<"IF_CONTENT"<<endl;
 				int top,med,bot;
 				top=if_stack.top();
 				if_stack.pop();
@@ -932,23 +935,23 @@ void empty_string_buffer()
 
 char *revise(char* str)
 {	
-	if(ReplaceStr(str,">","<=")
+	if(ReplaceStr(str,">","<="))
 		return str;
-	elseif(ReplaceStr(str,"<",">=")
+	else if(ReplaceStr(str,"<",">="))
 		return str;
-	elseif(ReplaceStr(str,">=","<")
+	else if(ReplaceStr(str,">=","<"))
 		return str;
-	elseif(ReplaceStr(str,"<=",">")
+	else if(ReplaceStr(str,"<=",">"))
 		return str;
-	elseif(ReplaceStr(str,"==","!=")
+	else if(ReplaceStr(str,"==","!="))
 		return str;
-	elseif(ReplaceStr(str,"!=","==")
+	else if(ReplaceStr(str,"!=","=="))
 		return str;
 	else
 		return str;
 }
 
-int ReplaceStr(char *sSrc, char *sMatchStr, char *sReplaceStr)
+int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr)
 {
         int  StringLen;
         char caNewString[MAX_MSG_LENGTH];
