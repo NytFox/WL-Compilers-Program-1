@@ -411,9 +411,10 @@ if_content : comparison AND if_content
 				if_stack.push(bot);
 				if_stack.push(med);
 				if_stack.push(top);	
+				cout<<"im upload:"<<upload<<endl; 
+				tmp_stack.push($1);	
 				$$=upload; 
-				cout<<"im $$"<<$$<<endl; 
-				tmp_stack.push($1);	 
+				 
 			}
 			|comparison OR if_content        
 			{
