@@ -123,33 +123,27 @@ type		: INT
 				char long_integer[]="long";
 				$$ = long_integer;
 			}
-			| BOOL
-			{
-				char BOOL[]="bool";
-				$$ = BOOL;
-			}
 			;
 
 
 //************************ sBlock **************************//
 sBlock : BEGIN_E declaration statement_list END_E
 		{
-			
+			//printf("\nEnter sBlock\n\n");
 			char *return_string;
-			char left_bracket[] = "\n{\n";
-			char right_bracket[] = "\n}\n";
+			char left_bracket[] = "{\n";
+			char right_bracket[] = "}\n";
 			return_string = string_connect(left_bracket,$2);
 			return_string = string_connect(return_string,$3);
 			return_string = string_connect(return_string,right_bracket);
 			$$ = return_string;
+			
 		}
 		| BEGIN_E statement_list END_E
 		{
-			//printf("\nEnter sBlock\n\n");
-			
 			char *return_string;
-			char left_bracket[] = "\n{\n";
-			char right_bracket[] = "\n}\n";
+			char left_bracket[] = "{\n";
+			char right_bracket[] = "}\n";
 
 			return_string = string_connect(left_bracket,$2);
 			//cout<<"TEST return string: "<<return_string<<endl;
@@ -159,8 +153,8 @@ sBlock : BEGIN_E declaration statement_list END_E
 		| BEGIN_E declaration END_E
 		{
 			char *return_string;
-			char left_bracket[] = "\n{\n";
-			char right_bracket[] = "\n}\n";
+			char left_bracket[] = "{\n";
+			char right_bracket[] = "}\n";
 			return_string = string_connect(left_bracket,$2);
 			return_string = string_connect(return_string,right_bracket);
 			$$ = return_string;
@@ -211,9 +205,6 @@ Expression_list : Expression ',' Expression_list
 statement : ID '(' Expression_list ')'
 			{
 				call_function($1, $3);
-				char *return_string = copy_buffer();
-				empty_string_buffer();
-				$$ = return_string;
 			}
 			;
 
@@ -223,29 +214,8 @@ statement  : call_id '=' Expression
 		{ 
 			//printf("\nSeen EXP PASSING\n\n");
 		    //cout<< "r"<<$1->offset <<" = "<< $3 << ";"<<endl;
-		    if($1->if_array == 1)
-			{
-				if(strcmp($1->type,"int")==0)
-				{
+			sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
 
-					//cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
-					//cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
-					char *data_shift = new_registrator();
-					char *total_shift = new_registrator();
-
-					//strcpy(read_array,"*(int_array+");
-					//strcat(read_array, total_shift);
-					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,array_target_location.top(),total_shift,data_shift,$1->array_location);
-					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s)",total_shift);
-					pop_array_target_location();
-				}
-
-			}
-			else
-			{
-				sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
-			}
-			sprintf(string_buffer + strlen(string_buffer)," = %s",$3);
 			char *return_string = copy_buffer();
 			empty_string_buffer();
 
@@ -257,67 +227,80 @@ statement  : call_id '=' Expression
 statement : do_loop_statement
 			{
 				//printf("\nSeen Do Loop;\n\n");
-				$$ = $1;
 			}
 			;
 
 do_loop_statement : do_begin statement_list do_end
 			{
-				char tmp[10000];
-				sprintf(tmp,"%s%s%s%s",$1,%2,tmp_stack.top(),%3);
-
-				char *return_string = 
-				tmp_stack.pop();
-				$$ = string_copy(tmp);
-
+				
+				//cout<<$1<<endl;
+				//cout<<$2<<endl;
+				//cout<<$3<<endl;
 			}
 			;
 
 do_begin : DO INTLITERAL ID '=' do_list
 			{
-				char tmp[1000];
-				int index;
-				index=do_stack.top();	
-				do_stack.pop();
-				//cout<<"L"<<index<<":"<<endl;
-				sprintf(tmp,"%sL%d:\n",$5,index);
-				$$ = string_copy(tmp);
-
+				/*int index;
+				index=do_stack.top();
+				do_stack.pop();	
+				cout<<"L"<<index<<":"<<endl;*/
 			}
 			;
 
 do_list : Expression ',' Expression
 		{
-			char tmp[1000];
-			char *increment = new_registrator;
-			sprintf(tmp,"%s = 1;\n",increment);
-
-			char tmp2[1000];
-			sprintf(tmp2,"%s=%s+1;\nif(%s<%s) ",increment,increment,$1,$3);
-			tmp_stack.push(tmp2);
-			$$ = string_copy(tmp);
+			char tmp[10000];
+			char *rd_1 = new_registrator();
+			char *rd_2 = new_registrator();
+			char *rd_3 = new_registrator();
+			strcpy(tmp,rd_1);
+			strcat(tmp,"=");
+			strcat(tmp,$1);
+			strcat(tmp,"/n");
+			strcpy(tmp,rd_2);
+			strcat(tmp,"=");
+			strcat(tmp,"1");
+			strcat(tmp,"/n");
+			strcpy(tmp,rd_3);
+			strcat(tmp,"=");
+			strcat(tmp,$3);
+			strcat(tmp,"/n");
+			$$=tmp;
 			
 		}
 		| Expression ',' Expression ',' Expression
 		{
-			char tmp2[1000];
-			sprintf(tmp2,"%s=%s+%s;\nif(%s<%s)",$1,$1,$5,$1,$3);
-			tmp_stack.push(tmp2);
-
-			char empty[]="";
-			$$ = string_copy(tmp);
+			char tmp[10000];
+			char *rd_1 = new_registrator();
+			char *rd_2 = new_registrator();
+			char *rd_3        = new_registrator();
+			strcpy(tmp,rd_1);
+			strcat(tmp,"=");
+			strcat(tmp,$1);
+			strcat(tmp,"/n");
+			strcpy(tmp,rd_2);
+			strcat(tmp,"=");
+			strcat(tmp,$5);
+			strcat(tmp,"/n");
+			strcpy(tmp,rd_3);
+			strcat(tmp,"=");
+			strcat(tmp,$3);
+			strcat(tmp,"/n");
+			$$=tmp;
 		}
 		;
 
 do_end : INTLITERAL CONTINUE
 			{
-				char tmp[1000];
-				int index = assign_next_lable();
-				do_stack.push(index);
-
-				sprintf(tmp,"goto L%d;\n",get_number(index));
-
-				$$ = string_copy(tmp);
+				/*char tmp[10000];
+				
+				do_stack.push(get_number(index));
+				strcpy(tmp,"goto L");
+				strcat(tmp,get_number(index));
+				strcat(tmp,";");
+				index+=1; 
+				$$=tmp;*/
 			}
 			;
 
@@ -336,12 +319,17 @@ statement : if_statement
 if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 			{
 				int top,med,bot;
+				char* tmp;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
 				if_stack.pop();
 				bot=if_stack.top();
 				if_stack.pop();
+				int length=strlen(tmp_stack.top());
+				tmp=new char[length+1];
+				strcpy(tmp,tmp_stack.top());
+				tmp_stack.pop();
 				/*cout<<"if("<<$3<<") goto L"<<med<<endl;
 				cout<<"L"<<top<<":"<<endl;
 				cout<<$7<<endl;
@@ -353,64 +341,89 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 			}
 			| IF '(' if_content ')' sBlock
 			{
-				cout<<"IF_CONTENT"<<endl;
 				int top,med,bot;
+				char* tmp;
+				char* upload;
+				cout<<"im $3"<<$3<<endl;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
 				if_stack.pop();
 				bot=if_stack.top();
 				if_stack.pop();
+				int length=strlen(tmp_stack.top());
+				tmp=new char[length+1];
+				strcpy(tmp,tmp_stack.top());
+				tmp_stack.pop();
+				length=strlen($3);
+				upload=new char[length+1];
+				strcpy(upload,$3);
 				/*cout<<"if("<<$3<<") goto L"<<med<<endl;
 				cout<<"L"<<top<<":"<<endl;
 				cout<<"goto L"<<bot<<endl;
 				cout<<"L"<<med<<":"<<endl;
 				cout<<$5<<endl;
 				cout<<"L"<<bot<<":"<<endl;*/
-
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\ngoto L%d\nL%d:%s\nL%d:\n",$3,med,top,bot,med,$5,bot);
+				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
+				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\ngoto L%d\nL%d:%s\nL%d:\n",tmp,med,top,bot,med,$5,bot);
+				
+				
 			}
 			;
 
 if_content : comparison AND if_content
 			{
 				int top,med,bot;
+				char* tmp;
+				char* upload;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
 				if_stack.pop();
 				bot=if_stack.top();
 				if_stack.pop();
-
+				tmp=string_copy(tmp_stack.top());
+				tmp_stack.pop();
 				/*cout<<"  if("<<revise($3)<<") goto L"<<top<<endl;*/
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\n",revise($3),top);
-
+				int length=strlen(tmp);
+				length+=strlen($3);
+				upload=new char[length+1];
+				strcpy(upload,$3); 
+				sprintf(upload+strlen(upload),"if(%s) goto L%d\n",revise(tmp),top);
+				
 				if_stack.push(bot);
 				if_stack.push(med);
 				if_stack.push(top);	
-				$$=$1;  	 
+				$$=upload; 
+				cout<<"im $$"<<$$<<endl; 
+				tmp_stack.push($1);	 
 			}
 			|comparison OR if_content        
 			{
 				int top,med,bot;
 				char* tmp;
-				string upload;
+				char* upload;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
 				if_stack.pop();
 				bot=if_stack.top();
 				if_stack.pop();
-				tmp=tmp_stack.top();
+				int length=strlen(tmp_stack.top());
+				tmp=new char[length+1];
+				strcpy(tmp,tmp_stack.top());
 				tmp_stack.pop();
 				/*cout<<"  if("<<$3<<") goto L"<<med<<endl;*/
+				length+=strlen($3);
+				upload=new char[length+1];
+				strcpy(upload,$3); 
 				sprintf(upload,"if(%s) goto L%d\n",tmp,med);
-
 				if_stack.push(bot);
 				if_stack.push(med);
-				if_stack.push(top);	
-				$$=$3+upload;
-				tmp_stack.push($1)				
+				if_stack.push(top);
+				cout<<upload<<endl;	
+				$$=upload;
+				tmp_stack.push($1);				
 			}
 			| comparison
 			{
@@ -418,6 +431,8 @@ if_content : comparison AND if_content
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());
+				char empty[]="";
+				$$=empty;
 			}
 			;
 
@@ -607,21 +622,21 @@ parentheses : '(' Expression ')'
 		| call_id
 		{
 			// cout<<"Seen ID->"<<$1->name<<endl;
-			if($1->if_array == 1)
+			if($1->if_array)
 			{
 				if(strcmp($1->type,"int")==0)
 				{
 
-					//cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
-					//cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
 					char *data_shift = new_registrator();
 					char *total_shift = new_registrator();
+					cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
+					cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
 
-					//strcpy(read_array,"*(int_array+");
-					//strcat(read_array, total_shift);
-					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,array_target_location.top(),total_shift,data_shift,$1->array_location);
-					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s)",total_shift);
+					char *read_array;
+					strcpy(read_array,"*(int_array+");
+					strcat(read_array, total_shift);
 					pop_array_target_location();
+					$$ = read_array;
 				}
 
 			}
@@ -743,11 +758,10 @@ char *Calc_exponential(const char *r1, const char *r2)
 {
 			int l = assign_next_lable();
 			char *rt_i = new_registrator();
+			cout<<rt_i<<"= 0;"<<endl;
 			char *rx = new_registrator();
 
-			/*
-			cout<<rt_i<<"= 0;"<<endl;
-			cout<<rx<<"= 1;"<<endl;
+			/*cout<<rx<<"= 1;"<<endl;
 			cout<<"L"<<l<<":"<<endl;
 			cout<<rx<<" = "<<rx<<"*"<<r1<<";"<<endl;
 			cout<<rt_i<<" = "<<rt_i<<" + 1;"<<endl;
@@ -957,6 +971,7 @@ void empty_string_buffer()
 
 char *revise(char* str)
 {	
+
 	if(ReplaceStr(str,">","<="))
 		return str;
 	else if(ReplaceStr(str,"<",">="))
@@ -965,9 +980,9 @@ char *revise(char* str)
 		return str;
 	else if(ReplaceStr(str,"<=",">"))
 		return str;
-	else if(ReplaceStr(str,"==","!="))
-		return str;
 	else if(ReplaceStr(str,"!=","=="))
+		return str;
+	else if(ReplaceStr(str,"==","!="))
 		return str;
 	else
 		return str;
@@ -976,7 +991,7 @@ char *revise(char* str)
 int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr)
 {
         int  StringLen;
-        char caNewString[MAX_MSG_LENGTH];
+        char caNewString[30];
  
         char *FindPos = strstr(sSrc, sMatchStr);
         if( (!FindPos) || (!sMatchStr) )
@@ -990,8 +1005,15 @@ int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr)
                 strcat(caNewString, sReplaceStr);
                 strcat(caNewString, FindPos + strlen(sMatchStr));
                 strcpy(sSrc, caNewString);
- 
                 FindPos = strstr(sSrc, sMatchStr);
         }
  	return 1;
+}
+char *string_copy(char *str)
+{
+	int len=strlen(str);
+	char* string;
+	string = new char[len+1];
+	strcpy(string,str);
+	return string;
 }
