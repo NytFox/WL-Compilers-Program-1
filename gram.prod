@@ -305,7 +305,7 @@ do_list : Expression ',' Expression
 			tmp_stack.push(tmp2);
 
 			char empty[]="";
-			$$ = string_copy(tmp);
+			$$ = empty;
 		}
 		;
 
