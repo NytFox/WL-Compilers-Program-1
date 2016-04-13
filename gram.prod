@@ -245,7 +245,6 @@ statement  : call_id '=' Expression
 			{
 				sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
 			}
-			sprintf(string_buffer + strlen(string_buffer)," = %s",$3);
 			char *return_string = copy_buffer();
 			empty_string_buffer();
 
