@@ -123,6 +123,11 @@ type		: INT
 				char long_integer[]="long";
 				$$ = long_integer;
 			}
+			| BOOL
+			{
+				char BOOL[]="bool";
+				$$ = BOOL;
+			}
 			;
 
 
@@ -140,7 +145,7 @@ sBlock : BEGIN_E declaration statement_list END_E
 		}
 		| BEGIN_E statement_list END_E
 		{
-			printf("\nEnter sBlock\n\n");
+			//printf("\nEnter sBlock\n\n");
 			
 			char *return_string;
 			char left_bracket[] = "\n{\n";
@@ -206,6 +211,9 @@ Expression_list : Expression ',' Expression_list
 statement : ID '(' Expression_list ')'
 			{
 				call_function($1, $3);
+				char *return_string = copy_buffer();
+				empty_string_buffer();
+				$$ = return_string;
 			}
 			;
 
@@ -215,8 +223,29 @@ statement  : call_id '=' Expression
 		{ 
 			//printf("\nSeen EXP PASSING\n\n");
 		    //cout<< "r"<<$1->offset <<" = "<< $3 << ";"<<endl;
-			sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
+		    if($1->if_array == 1)
+			{
+				if(strcmp($1->type,"int")==0)
+				{
 
+					//cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
+					//cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
+					char *data_shift = new_registrator();
+					char *total_shift = new_registrator();
+
+					//strcpy(read_array,"*(int_array+");
+					//strcat(read_array, total_shift);
+					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,array_target_location.top(),total_shift,data_shift,$1->array_location);
+					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s)",total_shift);
+					pop_array_target_location();
+				}
+
+			}
+			else
+			{
+				sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
+			}
+			sprintf(string_buffer + strlen(string_buffer)," = %s",$3);
 			char *return_string = copy_buffer();
 			empty_string_buffer();
 
@@ -586,21 +615,21 @@ parentheses : '(' Expression ')'
 		| call_id
 		{
 			// cout<<"Seen ID->"<<$1->name<<endl;
-			if($1->if_array)
+			if($1->if_array == 1)
 			{
 				if(strcmp($1->type,"int")==0)
 				{
 
+					//cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
+					//cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
 					char *data_shift = new_registrator();
 					char *total_shift = new_registrator();
-					cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
-					cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
 
-					char *read_array;
-					strcpy(read_array,"*(int_array+");
-					strcat(read_array, total_shift);
+					//strcpy(read_array,"*(int_array+");
+					//strcat(read_array, total_shift);
+					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,array_target_location.top(),total_shift,data_shift,$1->array_location);
+					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s)",total_shift);
 					pop_array_target_location();
-					$$ = read_array;
 				}
 
 			}

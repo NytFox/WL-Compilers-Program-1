@@ -13,6 +13,8 @@ extern "C"
 #include "y.tab.h"
 #include <iostream>
 using namespace std;
+int first_begin_skip = 1;
+int scope_count = 0;
 void process_id();
 int assign_next_register();
 void enter_scope();
@@ -23,13 +25,31 @@ void leave_scope();
 %%
 main 								{ return (MAIN);	}
 
-begin								{ return (BEGIN_E); enter_scope();	}
+begin								{ 	
+										if(first_begin_skip == 1) {}
+										else
+										{
+											first_begin_skip = 0; 
+											enter_scope();
+											scope_count++;
+										}
+										return (BEGIN_E);
+									}
 
-end									{ return (END_E);	leave_scope();	}					
+end									{ 
+										if(scope_count == 0){}
+										else
+										{
+											leave_scope();
+											scope_count--;
+										}
+										return (END_E);
+									}					
 
 int									{ fflush(stdout); return (INT);	}
 char								{ fflush(stdout); return (CHAR);	}
 void 								{ fflush(stdout); return (VOID);	}
+bool								{ fflush(stdout); return (BOOL);	}
 long								{ fflush(stdout); return (LONG);	}
 enum								{ fflush(stdout); return (ENUM);	}
 if									{ fflush(stdout); return (IF);	}
@@ -110,7 +130,7 @@ void enter_scope()
 	new_table->Enter_new_scope();
 }
 
-void back_scope()
+void leave_scope()
 {
 	new_table->Leave_current_scope();
 }

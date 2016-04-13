@@ -152,7 +152,7 @@ Symbol::Symbol(const char *s){
     next_bucket=NULL;
     offset = -1;
     array_location = -1;
-    if_array = 0;
+    if_array = -1;
 }
 
 Symbol* Symbol::Give_attributes(const char* t,const char* v, int offset){

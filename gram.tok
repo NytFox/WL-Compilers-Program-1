@@ -57,6 +57,7 @@ int MAX_MSG_LENGTH = 20;
 %token <stringstuff> CHAR
 %token <stringstuff> LONG
 %token ENUM
+%token BOOL
 %token VOID
 %token DO
 %token IF
