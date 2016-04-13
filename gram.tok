@@ -63,6 +63,7 @@ char empty_label[]="";
 %token IF
 %token ELSE
 %token CONTINUE
+%token <stringstuff> BOOL
 
 
 %token <stringstuff> AND

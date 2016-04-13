@@ -125,8 +125,8 @@ type		: INT
 			}
 			| BOOL
 			{
-				char BOOL[]="bool";
-				$$ = BOOL;
+				char bool_type[]="bool";
+				$$ = bool_type;
 			}
 			;
 
@@ -264,9 +264,7 @@ statement : do_loop_statement
 do_loop_statement : do_begin statement_list do_end
 			{
 				char tmp[10000];
-				sprintf(tmp,"%s%s%s%s",$1,%2,tmp_stack.top(),%3);
-
-				char *return_string = 
+				sprintf(tmp,"%s%s%s%s",$1,$2,tmp_stack.top(),$3);
 				tmp_stack.pop();
 				$$ = string_copy(tmp);
 
@@ -289,7 +287,7 @@ do_begin : DO INTLITERAL ID '=' do_list
 do_list : Expression ',' Expression
 		{
 			char tmp[1000];
-			char *increment = new_registrator;
+			char *increment = new_registrator();
 			sprintf(tmp,"%s = 1;\n",increment);
 
 			char tmp2[1000];
@@ -315,7 +313,7 @@ do_end : INTLITERAL CONTINUE
 				int index = assign_next_lable();
 				do_stack.push(index);
 
-				sprintf(tmp,"goto L%d;\n",get_number(index));
+				sprintf(tmp,"goto L%s;\n",get_number(index));
 
 				$$ = string_copy(tmp);
 			}
@@ -1009,7 +1007,7 @@ char *revise(char* str)
 int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr)
 {
         int  StringLen;
-        char caNewString[MAX_MSG_LENGTH];
+        char caNewString[50];
  
         char *FindPos = strstr(sSrc, sMatchStr);
         if( (!FindPos) || (!sMatchStr) )
