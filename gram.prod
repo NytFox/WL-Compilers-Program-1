@@ -393,24 +393,28 @@ if_content : comparison AND if_content
 			|comparison OR if_content        
 			{
 				int top,med,bot;
+				char* tmp;
+				string upload;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
 				if_stack.pop();
 				bot=if_stack.top();
 				if_stack.pop();
-
+				tmp=tmp_stack.top();
+				tmp_stack.pop();
 				/*cout<<"  if("<<$3<<") goto L"<<med<<endl;*/
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\n",$3,med);
+				sprintf(upload,"if(%s) goto L%d\n",tmp,med);
 
 				if_stack.push(bot);
 				if_stack.push(med);
 				if_stack.push(top);	
-				$$=$1;				
+				$$=$3+upload;
+				tmp_stack.push($1)				
 			}
 			| comparison
 			{
-				$$=$1;
+				tmp_stack.push($1);
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());
