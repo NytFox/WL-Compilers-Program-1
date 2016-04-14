@@ -265,10 +265,7 @@ do_loop_statement : do_begin statement_list do_end
 			{
 
 				char *return_string;
-				return_string = string_copy(do_tmp_stack.top());
-				do_tmp_stack.pop();
-				return_string = string_connect(return_string,$1);
-				return_string = string_connect(return_string,$2);
+				return_string = string_connect($1,$2);
 				return_string = string_connect(return_string,do_tmp_stack.top());	
 				do_tmp_stack.pop();
 				return_string = string_connect(return_string,$3);
@@ -279,13 +276,55 @@ do_loop_statement : do_begin statement_list do_end
 
 do_begin : DO INTLITERAL ID '=' do_list
 			{
+				char *stop = new_registrator();
+				char *start = start_expression_string($3);
+				char variable_initialization[1000];
+
+				if(strcmp($5,"3")==0)
+				{
+					char *increment = new_registrator();
+
+					sprintf(variable_initialization,"%s=%s;\n",start,do_tmp_stack.top());
+					do_tmp_stack.pop();
+					sprintf(variable_initialization+strlen(variable_initialization),"%s=%s;\n",stop,do_tmp_stack.top());
+					do_tmp_stack.pop();
+					sprintf(variable_initialization+strlen(variable_initialization),"%s=%s;\n",increment,do_tmp_stack.top());
+					do_tmp_stack.pop();
+
+					char end_if_stmt[1000];
+					sprintf(end_if_stmt,"%s=%s+%s;\nif(%s<%s)",start,start,increment,start,stop);
+
+
+					char *string_push_1;
+					string_push_1 = string_copy(end_if_stmt);
+					do_tmp_stack.push(string_push_1);
+				}
+				else if(strcmp($5,"2")==0)
+				{
+					char end_if_stmt[1000];	
+
+					sprintf(end_if_stmt,"%s=%s+1;\nif(%s<%s) ",start,start,start,stop);
+					sprintf(variable_initialization,"%s=%s;\n",start,do_tmp_stack.top());
+					do_tmp_stack.pop();
+					sprintf(variable_initialization+strlen(variable_initialization),"%s=%s;\n",stop,do_tmp_stack.top());
+					do_tmp_stack.pop();
+
+
+					char *string_push_1;
+					string_push_1 = string_copy(end_if_stmt);
+					do_tmp_stack.push(string_push_1);
+				}
+				else
+				{
+					cout<<"error"<<endl;
+				}
 
 				char tmp[1000];
 				int index;
 				index = assign_next_lable();
 				do_stack.push(index);
 				//cout<<"L"<<index<<":"<<endl;
-				sprintf(tmp,"%sL%d:\n",$5,index);
+				sprintf(tmp,"%sL%d:\n",variable_initialization,index);
 				$$ = string_copy(tmp);
 
 
@@ -294,48 +333,21 @@ do_begin : DO INTLITERAL ID '=' do_list
 
 do_list : Expression ',' Expression
 		{
-			char *start = new_registrator();
-			char *stop = new_registrator();
+			do_tmp_stack.push($3);
+			do_tmp_stack.push($1);
 
-			char tmp2[1000];
-			sprintf(tmp2,"%s=%s+1;\nif(%s<%s) ",start,start,start,stop);
-			do_tmp_stack.push(tmp2);
-
-			char tmp3[1000];
-			sprintf(tmp3,"%s=%s;\n%s=%s;\n ",start,$1,stop,$3);
-
-			char *string_push_1;
-			string_push_1 = string_copy(tmp2);
-			do_tmp_stack.push(string_push_1);
-
-			char *string_push_2;
-			string_push_2 = string_copy(tmp3);
-			do_tmp_stack.push(string_push_2);
-
-			$$ = string_copy(tmp);
+			char two_para[]="2";
+			$$ = two_para;
 		}
 		| Expression ',' Expression ',' Expression
 		{
-			char *start = new_registrator();
-			char *increment = new_registrator();
-			char *stop = new_registrator();
 
-			char tmp2[1000];
-			sprintf(tmp2,"%s=%s+%s;\nif(%s<%s)",start,start,increment,start,stop);
+			do_tmp_stack.push($5);
+			do_tmp_stack.push($3);
+			do_tmp_stack.push($1);
 
-			char tmp3[1000];
-			sprintf(tmp3,"%s=%s;\n%s=%s;\n ",start,$1,stop,$3);
-
-			char *string_push_1;
-			string_push_1 = string_copy(tmp2);
-			do_tmp_stack.push(string_push_1);
-
-			char *string_push_2;
-			string_push_2 = string_copy(tmp3);
-			do_tmp_stack.push(string_push_2);
-
-			char empty[]="";
-			$$ = empty;
+			char three_para[]="3";
+			$$ = three_para;
 		}
 		;
 
