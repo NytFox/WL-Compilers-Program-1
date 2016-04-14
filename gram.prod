@@ -245,6 +245,7 @@ statement  : call_id '=' Expression
 			{
 				sprintf(string_buffer + strlen(string_buffer),"r%d=%s;\n",$1->offset,$3);
 			}
+			
 			char *return_string = copy_buffer();
 			empty_string_buffer();
 
@@ -262,44 +263,81 @@ statement : do_loop_statement
 
 do_loop_statement : do_begin statement_list do_end
 			{
-				char tmp[10000];
-				sprintf(tmp,"%s%s%s%s",$1,$2,tmp_stack.top(),$3);
-				tmp_stack.pop();
-				$$ = string_copy(tmp);
+
+				char *return_string;
+				return_string = string_copy(do_tmp_stack.top());
+				do_tmp_stack.pop();
+				return_string = string_connect(return_string,$1);
+				return_string = string_connect(return_string,$2);
+				return_string = string_connect(return_string,do_tmp_stack.top());	
+				do_tmp_stack.pop();
+				return_string = string_connect(return_string,$3);
+				$$ = return_string;
 
 			}
 			;
 
 do_begin : DO INTLITERAL ID '=' do_list
 			{
+
 				char tmp[1000];
 				int index;
-				index=do_stack.top();	
-				do_stack.pop();
+				index = assign_next_lable();
+				do_stack.push(index);
 				//cout<<"L"<<index<<":"<<endl;
 				sprintf(tmp,"%sL%d:\n",$5,index);
 				$$ = string_copy(tmp);
+
 
 			}
 			;
 
 do_list : Expression ',' Expression
 		{
+			char *start = new_registrator();
+			char *stop = new_registrator();
+
 			char tmp[1000];
 			char *increment = new_registrator();
 			sprintf(tmp,"%s = 1;\n",increment);
 
 			char tmp2[1000];
-			sprintf(tmp2,"%s=%s+1;\nif(%s<%s) ",increment,increment,$1,$3);
-			tmp_stack.push(tmp2);
+			sprintf(tmp2,"%s=%s+1;\nif(%s<%s) ",increment,increment,start,stop);
+			do_tmp_stack.push(tmp2);
+
+			char tmp3[1000];
+			sprintf(tmp3,"%s=%s;\n%s=%s;\n ",start,$1,stop,$3);
+
+			char *string_push_1;
+			string_push_1 = string_copy(tmp2);
+			do_tmp_stack.push(string_push_1);
+
+			char *string_push_2;
+			string_push_2 = string_copy(tmp3);
+			do_tmp_stack.push(string_push_2);
+
 			$$ = string_copy(tmp);
 			
 		}
 		| Expression ',' Expression ',' Expression
 		{
+			char *start = new_registrator();
+			char *increment = new_registrator();
+			char *stop = new_registrator();
+
 			char tmp2[1000];
-			sprintf(tmp2,"%s=%s+%s;\nif(%s<%s)",$1,$1,$5,$1,$3);
-			tmp_stack.push(tmp2);
+			sprintf(tmp2,"%s=%s+%s;\nif(%s<%s)",start,start,increment,start,stop);
+
+			char tmp3[1000];
+			sprintf(tmp3,"%s=%s;\n%s=%s;\n ",start,$1,stop,$3);
+
+			char *string_push_1;
+			string_push_1 = string_copy(tmp2);
+			do_tmp_stack.push(string_push_1);
+
+			char *string_push_2;
+			string_push_2 = string_copy(tmp3);
+			do_tmp_stack.push(string_push_2);
 
 			char empty[]="";
 			$$ = empty;
@@ -308,11 +346,11 @@ do_list : Expression ',' Expression
 
 do_end : INTLITERAL CONTINUE
 			{
-				char tmp[1000];
-				int index = assign_next_lable();
-				do_stack.push(index);
 
-				sprintf(tmp,"goto L%s;\n",get_number(index));
+				char tmp[1000];
+				int index = do_stack.top();
+				do_stack.pop();
+				sprintf(tmp,"goto L%d;\n",index);
 
 				$$ = string_copy(tmp);
 			}
@@ -358,7 +396,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				int top,med,bot;
 				char* tmp;
 				char* upload;
-				cout<<"im $3"<<$3<<endl;
+				//cout<<"im $3"<<$3<<endl;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
@@ -399,16 +437,20 @@ if_content : comparison AND if_content
 				tmp=string_copy(tmp_stack.top());
 				tmp_stack.pop();
 				/*cout<<"  if("<<revise($3)<<") goto L"<<top<<endl;*/
+				char tmp2[1000];
+				sprintf(tmp2,"if(%s) goto L%d\n",revise(tmp),top);
+
 				int length=strlen(tmp);
 				length+=strlen($3);
+				length+=strlen(tmp2);
 				upload=new char[length+1];
-				strcpy(upload,$3); 
-				sprintf(upload+strlen(upload),"if(%s) goto L%d\n",revise(tmp),top);
+
+				sprintf(upload,"%s%s",$3,tmp2);
 				
 				if_stack.push(bot);
 				if_stack.push(med);
 				if_stack.push(top);	
-				cout<<"im upload:"<<upload<<endl; 
+				//cout<<"im upload:"<<upload<<endl; 
 				tmp_stack.push($1);	
 				$$=upload; 
 				 
@@ -424,19 +466,21 @@ if_content : comparison AND if_content
 				if_stack.pop();
 				bot=if_stack.top();
 				if_stack.pop();
-				int length=strlen(tmp_stack.top());
-				tmp=new char[length+1];
-				strcpy(tmp,tmp_stack.top());
+				tmp=string_copy(tmp_stack.top());
 				tmp_stack.pop();
 				/*cout<<"  if("<<$3<<") goto L"<<med<<endl;*/
+				char tmp2[1000];
+				sprintf(tmp2,"if(%s) goto L%d\n",tmp,med);
+				int length=strlen(tmp);
 				length+=strlen($3);
+				length+=strlen(tmp2);
 				upload=new char[length+1];
-				strcpy(upload,$3); 
-				sprintf(upload,"if(%s) goto L%d\n",tmp,med);
+				sprintf(upload,"%s%s",$3,tmp2);
+
 				if_stack.push(bot);
 				if_stack.push(med);
 				if_stack.push(top);
-				cout<<upload<<endl;	
+				//cout<<upload<<endl;	
 				$$=upload;
 				tmp_stack.push($1);				
 			}
@@ -529,7 +573,7 @@ comparison : Expression '.' GT '.' Expression
 				strcat(tmp,$5);
 				$$=tmp;*/
 
-				char eq[]="==";
+				char eq[]="!=";
 				char *return_string;
 				return_string = string_connect($1,eq);
 				return_string = string_connect(return_string,$5);
@@ -985,23 +1029,55 @@ void empty_string_buffer()
 	}
 }
 
-char *revise(char* str)
-{	
-	if(ReplaceStr(str,">","<="))
-		return str;
-	else if(ReplaceStr(str,"<",">="))
-		return str;
-	else if(ReplaceStr(str,">=","<"))
-		return str;
-	else if(ReplaceStr(str,"<=",">"))
-		return str;
-	else if(ReplaceStr(str,"==","!="))
-		return str;
-	else if(ReplaceStr(str,"!=","=="))
-		return str;
-	else
-		return str;
+char *revise(char* original)
+{
+	string str(original);
+	char *output;
+	string::size_type position=0;
+	position=str.find(">");
+	if(position!=string::npos){
+		str.replace(position,1,"<=");
+		output = new char[str.length()+1];
+		strcpy(output, str.c_str());
+		return output;
+	}
+	position=str.find("<");
+	if(position!=string::npos){
+		str.replace(position,1,">=");
+		output = new char[str.length()+1];
+		strcpy(output, str.c_str());
+		return output;
+	}
+	position=str.find(">=");
+	if(position!=string::npos){
+		str.replace(position,2,"<");
+		output = new char[str.length()+1];
+		strcpy(output, str.c_str());
+		return output;
+	}
+	position=str.find("<=");
+	if(position!=string::npos){
+		str.replace(position,2,">");
+		output = new char[str.length()+1];
+		strcpy(output, str.c_str());
+		return output;
+	}
+	position=str.find("!=");
+	if(position!=string::npos){
+		str.replace(position,2,"==");
+		output = new char[str.length()+1];
+		strcpy(output, str.c_str());
+		return output;
+	}
+	position=str.find("==");
+	if(position!=string::npos){
+		str.replace(position,2,"!=");
+		output = new char[str.length()+1];
+		strcpy(output, str.c_str());
+		return output;
+	}
 }
+
 
 int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr)
 {

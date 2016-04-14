@@ -9,6 +9,7 @@ extern "C"
 #include <ctype.h>
 #include <stack> 
 #include <sstream> // for ostringstream
+#include <string>
 char *start_expression_string(Symbol *symbol);
 void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
@@ -37,6 +38,7 @@ stack<char *> array_target_location;
 stack<int> if_stack;
 stack<int> do_stack;
 stack<char *> tmp_stack;
+stack<char *> do_tmp_stack;
 char string_buffer[1000];
 int Label;
 char empty_label[]="";
