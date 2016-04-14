@@ -718,6 +718,10 @@ parentheses : '(' Expression ')'
 			// cout<<"Seen INTLITERAL->"<<$1<<endl;
 			$$ = get_number($1);
 		}
+		| STRING_LITERAL 
+		{
+
+		}
 		;
 
 call_id : ID '[' Expression_list ']'
@@ -962,6 +966,12 @@ char* call_function(Symbol *func,char *para_list)
 			//cout<<"printline();"<<endl;
 			sprintf(string_buffer + strlen(string_buffer),"printline();\n");
 		}
+	else
+	if(strcmp(func->name,"prints")==0)
+		{
+			//cout<<"printline();"<<endl;
+			sprintf(string_buffer + strlen(string_buffer),"printString(%s);\n",para_list);
+		}
 	// custom functions
 	else
 	{
@@ -1008,7 +1018,7 @@ void assign_array_info(char *type, Symbol *id,int size)
 {
 	static int int_size_level;
 	static int char_size_level;
-	id->type = type;
+	strcpy(id->type, type);
 	id->if_array = 1;
 	if(strcmp(type,"int")==0)
 	{

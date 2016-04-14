@@ -2,6 +2,7 @@ Digit		[0-9]
 Letter		[a-zA-Z]
 IntLit		{Digit}+
 
+
 %{
 extern "C"
 {
@@ -73,6 +74,7 @@ le 									{ fflush(stdout); return (LE);	}
 
 {IntLit}							{ yylval.intstuff = atoi(yytext);
 				          			  return (INTLITERAL);	}
+L?\"(\\.|[^\\"])*\"					{ yylval.stringstuff = yytext; return(STRING_LITERAL); }			          			  
 
 "="									{ return ('=');		}
 ";"									{ return (';');		}

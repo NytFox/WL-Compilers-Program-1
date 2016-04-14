@@ -80,6 +80,7 @@ char empty_label[]="";
 %token <stringstuff> RIGHT_SHIFT
 %token <intstuff> INTLITERAL
 %token <symbolstuff> ID
+%token <stringstuff> STRING_LITERAL
 
 %type <stringstuff> factor 
 %type <stringstuff> term
