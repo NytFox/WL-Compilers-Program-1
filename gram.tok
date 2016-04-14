@@ -39,6 +39,8 @@ stack<int> if_stack;
 stack<int> do_stack;
 stack<char *> tmp_stack;
 stack<char *> do_tmp_stack;
+stack<char *> explist_tmp_stack;
+
 char string_buffer[1000];
 int Label;
 char empty_label[]="";

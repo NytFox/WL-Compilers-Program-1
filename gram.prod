@@ -191,6 +191,8 @@ Expression_list : Expression ',' Expression_list
 		{
 			char *return_string;
 			char comma[] = ",";
+			explist_tmp_stack.push($1);
+
 			return_string = string_connect($1,comma);
 
 			return_string = string_connect(return_string,$3);
@@ -198,6 +200,7 @@ Expression_list : Expression ',' Expression_list
 		}
 		| Expression
 		{
+			explist_tmp_stack.push($1);
 			$$ = $1;
 		}
 		| /* empty */
@@ -228,16 +231,22 @@ statement  : call_id '=' Expression
 				if(strcmp($1->type,"int")==0)
 				{
 
-					//cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
-					//cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
+					char data_shift_initialization[1000];
+					char *init = new_registrator();
+					sprintf(data_shift_initialization,"%s = 1;\n",init);
+					while(!explist_tmp_stack.empty())
+					{
+						sprintf(data_shift_initialization + strlen(data_shift_initialization),"%s = %s * %s;\n",init,init,explist_tmp_stack.top());
+						explist_tmp_stack.pop();
+
+					}
 					char *data_shift = new_registrator();
 					char *total_shift = new_registrator();
-
-					//strcpy(read_array,"*(int_array+");
-					//strcat(read_array, total_shift);
-					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,array_target_location.top(),total_shift,data_shift,$1->array_location);
-					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s)",total_shift);
+					sprintf(string_buffer + strlen(string_buffer),"%s",data_shift_initialization);
+					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,init,total_shift,data_shift,$1->array_location);
+					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s) = %s;\n",total_shift,$3);
 					pop_array_target_location();
+
 				}
 
 			}
@@ -982,7 +991,7 @@ char* call_function(Symbol *func,char *para_list)
 
 void assign_variable_type(char *type,Symbol *id)
 {
-	id->type = type;
+	id->type = string_copy(type);
 }
 
 char* string_connect(char *a, char *b)
@@ -1018,7 +1027,7 @@ void assign_array_info(char *type, Symbol *id,int size)
 {
 	static int int_size_level;
 	static int char_size_level;
-	strcpy(id->type, type);
+	id->type = string_copy(type);
 	id->if_array = 1;
 	if(strcmp(type,"int")==0)
 	{
