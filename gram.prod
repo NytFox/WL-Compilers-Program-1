@@ -297,6 +297,10 @@ do_list : Expression ',' Expression
 			char *start = new_registrator();
 			char *stop = new_registrator();
 
+			/*char tmp[1000];
+			char *increment = new_registrator();
+			sprintf(tmp,"%s=1;\n",increment);*/
+
 			char tmp2[1000];
 			sprintf(tmp2,"%s=%s+1;\nif(%s<%s) ",start,start,start,stop);
 			do_tmp_stack.push(tmp2);
@@ -312,13 +316,18 @@ do_list : Expression ',' Expression
 			string_push_2 = string_copy(tmp3);
 			do_tmp_stack.push(string_push_2);
 
-			$$ = string_copy(tmp);
+			//$$ = string_copy(tmp);
+			char empty[]="";
+			$$ = empty;
 		}
 		| Expression ',' Expression ',' Expression
 		{
 			char *start = new_registrator();
 			char *increment = new_registrator();
 			char *stop = new_registrator();
+
+			char tmp[1000];
+			sprintf(tmp,"%s=%s;\n",increment,$5);
 
 			char tmp2[1000];
 			sprintf(tmp2,"%s=%s+%s;\nif(%s<%s)",start,start,increment,start,stop);
@@ -334,8 +343,9 @@ do_list : Expression ',' Expression
 			string_push_2 = string_copy(tmp3);
 			do_tmp_stack.push(string_push_2);
 
-			char empty[]="";
-			$$ = empty;
+			//char empty[]="";
+			//$$ = empty;
+			$$ = string_copy(tmp);
 		}
 		;
 
@@ -656,10 +666,9 @@ term : 	term '*' factor
 factor 	: factor EXPO parentheses
 		{
 			// printf("Seen: EXPO_OP\n");
-
-			char *rd = new_registrator(); 	
-		    cout<< rd <<" = "<<Calc_exponential($1,$3)<<";"<<endl;
-			$$ = rd;
+	
+		    //cout<< rd <<" = "<<Calc_exponential($1,$3)<<";"<<endl;
+			$$ = Calc_exponential($1,$3);
 		}
 		| parentheses
 		{
