@@ -423,8 +423,8 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				cout<<"L"<<med<<":"<<endl;
 				cout<<$5<<endl;
 				cout<<"L"<<bot<<":"<<endl;*/
-				sprintf(string_buffer+strlen(string_buffer),"%s",if_buffer);
-				empty_string_buffer(if_buffer);
+				sprintf(string_buffer+strlen(string_buffer),"%s",if_tmp_stack.top());
+				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d: r28 = 0;\ngoto L%d\nL%d: r28 = 0;\n %s\nL%d: r28 = 0;\n",tmp,med,top,bot,med,$5,bot);
 				
@@ -434,7 +434,11 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 
 if_content : comparison AND if_content
 			{
-				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
+				char tmp_push[1000];
+				char *push_level;
+				if_tmp_stack.push(push_level);
+				sprintf(tmp_push,"%s",string_buffer);
+				if_tmp_stack.top() = string_connect(if_tmp_stack.top(),tmp_push);
 				empty_string_buffer(string_buffer);
 
 				int top,med,bot;
@@ -469,7 +473,11 @@ if_content : comparison AND if_content
 			}
 			|comparison OR if_content        
 			{
-				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
+				char tmp_push[1000];
+				char *push_level;
+				if_tmp_stack.push(push_level);
+				sprintf(tmp_push,"%s",string_buffer);
+				if_tmp_stack.top() = string_connect(if_tmp_stack.top(),tmp_push);
 				empty_string_buffer(string_buffer);
 
 				int top,med,bot;
@@ -501,7 +509,12 @@ if_content : comparison AND if_content
 			}
 			| comparison
 			{
-				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
+				char tmp_push[1000];
+				char *push_level;
+				if_tmp_stack.push(push_level);
+				sprintf(tmp_push,"%s",string_buffer);
+				push_level = string_copy(tmp_push);
+				if_tmp_stack.push(push_level);
 				empty_string_buffer(string_buffer);
 
 				tmp_stack.push($1);
