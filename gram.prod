@@ -39,8 +39,17 @@ FuncList : Function FuncList
 
 Function :  MAIN  '(' ')' ':' VOID sBlock
 			{
-				char return_string[]="main()\n";
-				$$ = string_connect(return_string,$6);
+				char *return_string;
+
+				char main_string[]="main()\n";
+				char left_bracket[] = "\n{\n";
+				char right_bracket[] = "\n}\n";
+
+				return_string = string_connect(main_string,left_bracket);
+				return_string = string_connect(return_string,$6);
+				return_string = string_connect(return_string,right_bracket);
+
+				$$ = return_string;
 			}
 			| ID '(' Parameter_list ')'
 			{
