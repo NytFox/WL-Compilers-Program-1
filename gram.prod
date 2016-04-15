@@ -315,7 +315,7 @@ do_begin : DO INTLITERAL ID '=' do_list
 				index = assign_next_lable();
 				do_stack.push(index);
 				//cout<<"L"<<index<<":"<<endl;
-				sprintf(tmp,"%sL%d:\n",variable_initialization,index);
+				sprintf(tmp,"%sL%d: r28 = 0;\n",variable_initialization,index);
 				$$ = string_copy(tmp);
 
 
@@ -396,7 +396,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				empty_string_buffer(if_buffer);
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\n%s\ngoto L%d\nL%d:%s\nL%d:\n",tmp,med,top,$7,bot,med,$5,bot);
+				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d: r28 = 0;\n%s\ngoto L%d\nL%d: r28 = 0;\n%s\nL%d: r28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
 			}
 			| IF '(' if_content ')' sBlock
 			{
@@ -426,7 +426,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				sprintf(string_buffer+strlen(string_buffer),"%s",if_buffer);
 				empty_string_buffer(if_buffer);
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\ngoto L%d\nL%d:%s\nL%d:\n",tmp,med,top,bot,med,$5,bot);
+				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d: r28 = 0;\ngoto L%d\nL%d: r28 = 0;\n %s\nL%d: r28 = 0;\n",tmp,med,top,bot,med,$5,bot);
 				
 				
 			}
@@ -874,7 +874,7 @@ char *Calc_exponential(const char *r1, const char *r2)
 			cout<<rx<<" = "<<rx<<"*"<<r1<<";"<<endl;
 			cout<<rt_i<<" = "<<rt_i<<" + 1;"<<endl;
 			cout<<"if("<<r2<<">"<<rt_i<<") goto L"<<l<<";"<<endl;*/
-			sprintf(string_buffer + strlen(string_buffer),"%s= 0;\n%s= 1;\nL%d:\n%s = %s*%s;\n%s = %s + 1;\nif(%s>%s) goto L%d;\n",rt_i,rx,l,rx,rx,r1,rt_i,rt_i,r2,rt_i,l);
+			sprintf(string_buffer + strlen(string_buffer),"%s= 0;\n%s= 1;\nL%d: r28 = 0;\n%s = %s*%s;\n%s = %s + 1;\nif(%s>%s) goto L%d;\n",rt_i,rx,l,rx,rx,r1,rt_i,rt_i,r2,rt_i,l);
 
 			return rx;
 }
