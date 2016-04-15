@@ -196,10 +196,14 @@ Expression_list : Expression ',' Expression_list
 			return_string = string_connect($1,comma);
 
 			return_string = string_connect(return_string,$3);
+
+
+
 			$$ = return_string;
 		}
 		| Expression
 		{
+
 			explist_tmp_stack.push($1);
 			$$ = $1;
 		}
@@ -224,30 +228,12 @@ statement : ID '(' Expression_list ')'
 
 statement  : call_id '=' Expression
 		{ 
-			//printf("\nSeen EXP PASSING\n\n");
-		    //cout<< "r"<<$1->offset <<" = "<< $3 << ";"<<endl;
-		    if($1->if_array == 1)
+			if($1->if_array == 1)
 			{
-				if(strcmp($1->type,"int")==0)
-				{
+				char *array_target = array_target_location.top();
+				array_target_location.pop();
 
-					char data_shift_initialization[1000];
-					char *init = new_registrator();
-					sprintf(data_shift_initialization,"%s = 1;\n",init);
-					while(!explist_tmp_stack.empty())
-					{
-						sprintf(data_shift_initialization + strlen(data_shift_initialization),"%s = %s * %s;\n",init,init,explist_tmp_stack.top());
-						explist_tmp_stack.pop();
-
-					}
-					char *data_shift = new_registrator();
-					char *total_shift = new_registrator();
-					sprintf(string_buffer + strlen(string_buffer),"%s",data_shift_initialization);
-					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,init,total_shift,data_shift,$1->array_location);
-					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s) = %s;\n",total_shift,$3);
-					pop_array_target_location();
-
-				}
+				sprintf(string_buffer + strlen(string_buffer),"%s=%s;\n",array_target,$3);
 
 			}
 			else
@@ -699,27 +685,14 @@ parentheses : '(' Expression ')'
 			// cout<<"Seen ID->"<<$1->name<<endl;
 			if($1->if_array == 1)
 			{
-				if(strcmp($1->type,"int")==0)
-				{
-
-					//cout<<data_shift<<"="<<array_target_location.top()<<"*"<<4<<";"<<endl;
-					//cout<<total_shift<<"="<<data_shift<<"+"<<$1->array_location<<";"<<endl;
-					char *data_shift = new_registrator();
-					char *total_shift = new_registrator();
-
-					//strcpy(read_array,"*(int_array+");
-					//strcat(read_array, total_shift);
-					sprintf(string_buffer + strlen(string_buffer),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,array_target_location.top(),total_shift,data_shift,$1->array_location);
-					sprintf(string_buffer + strlen(string_buffer),"*(int_array+%s)",total_shift);
-					pop_array_target_location();
-				}
+				char *array_target = array_target_location.top();
+				array_target_location.pop();
+				$$ = array_target;
 
 			}
 			else
 			{
-
-			$$ = start_expression_string($1);
-
+				$$ = start_expression_string($1);
 			}
 		}
 		| INTLITERAL
@@ -735,7 +708,39 @@ parentheses : '(' Expression ')'
 
 call_id : ID '[' Expression_list ']'
 		{
-			push_array_target_location($3);
+			
+				if(strcmp($1->type,"int")==0)
+				{
+
+					char init_part[1000];
+					char target_part[1000];
+					char *init = new_registrator();
+					sprintf(init_part,"%s = 1;\n",init);
+
+					
+					while(!explist_tmp_stack.empty())
+					{
+						sprintf(init_part + strlen(init_part),"%s = %s * %s;\n",init,init,explist_tmp_stack.top());
+						explist_tmp_stack.pop();
+
+					}
+
+				
+					char *data_shift = new_registrator();
+					char *total_shift = new_registrator();
+
+					sprintf(init_part + strlen(init_part),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,init,total_shift,data_shift,$1->array_location);
+					sprintf(target_part,"*(int_array+%s)",total_shift);
+
+					sprintf(string_buffer + strlen(string_buffer),"%s",init_part);
+
+					char *push_target;
+					push_target = string_copy(target_part);
+					array_target_location.push(target_part);
+
+				}
+
+
 			$$ = $1;
 		}
 		| ID
@@ -958,7 +963,7 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 		}
 	}
 	//cout<<";"<<endl;
-	sprintf(string_buffer + strlen(string_buffer),";");
+	sprintf(string_buffer + strlen(string_buffer),";\n");
 }
 
 char* call_function(Symbol *func,char *para_list)
