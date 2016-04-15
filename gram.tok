@@ -29,7 +29,7 @@ void assign_variable_type(char *type,Symbol *id);
 char* call_function(Symbol *func,char *para_list);
 void pop_array_target_location();
 char* string_connect(char *a, char *b);
-void empty_string_buffer();
+void empty_string_buffer(char *buffer);
 char* copy_buffer();
 int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr);
 char *string_copy(char *str);
@@ -42,10 +42,11 @@ stack<char *> do_tmp_stack;
 stack<char *> explist_tmp_stack;
 stack<char *> if_tmp_stack;
 char if_buffer[10000];
-
 char string_buffer[10000];
 int Label;
 char empty_label[]="";
+
+int register_num = 0;
 %}
 
 %union 

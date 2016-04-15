@@ -3,7 +3,13 @@
 %%
 Program_Initialization : Program
 		{
-			cout<<"int r0, r1, r2, r3, r4, r5, r6, r7;\nint *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_variable[1024];\nchar char_variable[1024];\n";
+			cout<<"int ";
+			for(int i = 0;i<28;i++)
+			{
+				cout<<"r"<<i<<", ";
+			}
+			cout<<"r28;\n";
+			cout<<"int *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_array[1024];\nchar char_array[1024];\n";
 			cout<< $1;
 		}
 		;
@@ -136,40 +142,21 @@ sBlock : BEGIN_E declaration statement_list END_E
 		{
 			
 			char *return_string;
-			char left_bracket[] = "\n{\n";
-			char right_bracket[] = "\n}\n";
-			return_string = string_connect(left_bracket,$2);
-			return_string = string_connect(return_string,$3);
-			return_string = string_connect(return_string,right_bracket);
+			return_string = string_connect($2,$3);
 			$$ = return_string;
 		}
 		| BEGIN_E statement_list END_E
-		{
-			//printf("\nEnter sBlock\n\n");
-			
-			char *return_string;
-			char left_bracket[] = "\n{\n";
-			char right_bracket[] = "\n}\n";
+		{			
 
-			return_string = string_connect(left_bracket,$2);
-			//cout<<"TEST return string: "<<return_string<<endl;
-			return_string = string_connect(return_string,right_bracket);
-			$$ = return_string;
+			$$ = $2;
 		}
 		| BEGIN_E declaration END_E
 		{
-			char *return_string;
-			char left_bracket[] = "\n{\n";
-			char right_bracket[] = "\n}\n";
-			return_string = string_connect(left_bracket,$2);
-			return_string = string_connect(return_string,right_bracket);
-			$$ = return_string;
+			$$ = $2;
 		}
 		| BEGIN_E END_E
 		{
-			char left_bracket[] = "{\n";
-			char right_bracket[] = "}\n";
-			$$ = string_connect(left_bracket,right_bracket);
+
 		}
 		;
 
@@ -219,7 +206,7 @@ statement : ID '(' Expression_list ')'
 			{
 				call_function($1, $3);
 				char *return_string = copy_buffer();
-				empty_string_buffer();
+				empty_string_buffer(string_buffer);
 				$$ = return_string;
 			}
 			;
@@ -242,7 +229,7 @@ statement  : call_id '=' Expression
 			}
 			
 			char *return_string = copy_buffer();
-			empty_string_buffer();
+			empty_string_buffer(string_buffer);
 
 			$$ = return_string;
 		}
@@ -366,7 +353,7 @@ statement : if_statement
 
 				char *return_string;
 				return_string = copy_buffer();
-				empty_string_buffer();
+				empty_string_buffer(string_buffer);
 				$$ = return_string;
 			}
 			;
@@ -375,6 +362,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 			{
 				int top,med,bot;
 				char* tmp;
+				char* upload;
 				top=if_stack.top();
 				if_stack.pop();
 				med=if_stack.top();
@@ -385,6 +373,9 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				tmp=new char[length+1];
 				strcpy(tmp,tmp_stack.top());
 				tmp_stack.pop();
+				length=strlen($3);
+				upload=new char[length+1];
+				strcpy(upload,$3);
 				/*cout<<"if("<<$3<<") goto L"<<med<<endl;
 				cout<<"L"<<top<<":"<<endl;
 				cout<<$7<<endl;
@@ -392,7 +383,11 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				cout<<"L"<<med<<":"<<endl;
 				cout<<$5<<endl;
 				cout<<"L"<<bot<<":"<<endl;*/
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\n%s\ngoto L%d\nL%d:%s\nL%d:\n",$3,med,top,$7,bot,med,$5,bot);
+				sprintf(string_buffer+strlen(string_buffer),"%s",if_buffer);
+				empty_string_buffer(if_buffer);
+				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
+
+				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\n%s\ngoto L%d\nL%d:%s\nL%d:\n",tmp,med,top,$7,bot,med,$5,bot);
 			}
 			| IF '(' if_content ')' sBlock
 			{
@@ -419,7 +414,8 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				cout<<"L"<<med<<":"<<endl;
 				cout<<$5<<endl;
 				cout<<"L"<<bot<<":"<<endl;*/
-
+				sprintf(string_buffer+strlen(string_buffer),"%s",if_buffer);
+				empty_string_buffer(if_buffer);
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\ngoto L%d\nL%d:%s\nL%d:\n",tmp,med,top,bot,med,$5,bot);
 				
@@ -429,6 +425,9 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 
 if_content : comparison AND if_content
 			{
+				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
+				empty_string_buffer(string_buffer);
+
 				int top,med,bot;
 				char* tmp;
 				char* upload;
@@ -462,8 +461,8 @@ if_content : comparison AND if_content
 			|comparison OR if_content        
 			{
 				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
-				empty_string_buffer();
-				
+				empty_string_buffer(string_buffer);
+
 				int top,med,bot;
 				char* tmp;
 				char* upload;
@@ -494,7 +493,7 @@ if_content : comparison AND if_content
 			| comparison
 			{
 				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
-				empty_string_buffer();
+				empty_string_buffer(string_buffer);
 
 				tmp_stack.push($1);
 				if_stack.push(assign_next_lable());
@@ -709,7 +708,8 @@ parentheses : '(' Expression ')'
 		}
 		| STRING_LITERAL 
 		{
-
+			char *string = string_copy($1);
+			$$ = string;
 		}
 		;
 
@@ -827,6 +827,7 @@ char *start_expression_string(Symbol *symbol)
 
 char *new_registrator()
 {
+
 	char buffer[10];
 	char *result;
 	result = (char *)malloc(4);  /*  tacky, but should be big enuff  */
@@ -834,6 +835,8 @@ char *new_registrator()
 	strcpy(result,"r");
 	sprintf(buffer,"%d",assign_next_register());
 	strcat(result,buffer);
+
+	register_num++;
 	return result;
 }
 
@@ -1058,12 +1061,12 @@ void pop_array_target_location()
 	array_target_location.pop();
 }
 
-void empty_string_buffer()
+void empty_string_buffer(char *buffer)
 {
 	int i;
-	for(i=0;i<1000;i++)
+	for(i=0;i<10000;i++)
 	{
-		string_buffer[i] = '\0';
+		buffer[i] = '\0';
 	}
 }
 
