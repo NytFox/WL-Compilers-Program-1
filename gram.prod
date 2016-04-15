@@ -9,7 +9,7 @@ Program_Initialization : Program
 				cout<<"r"<<i<<", ";
 			}
 			cout<<"r28;\n";
-			cout<<"int *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_array[1024];\nchar char_array[1024];\n";
+			cout<<"int *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_array[66666666];\nchar char_array[66666666];\n";
 			cout<< $1;
 		}
 		;
