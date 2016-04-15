@@ -702,7 +702,11 @@ parentheses : '(' Expression ')'
 			{
 				char *array_target = array_target_location.top();
 				array_target_location.pop();
-				$$ = array_target;
+
+				char *array_acceptor = new_registrator();
+				sprintf(string_buffer + strlen(string_buffer),"%s = %s;\n",array_acceptor, array_target);
+
+				$$ = array_acceptor;
 
 			}
 			else
