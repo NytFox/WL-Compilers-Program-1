@@ -419,6 +419,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				cout<<"L"<<med<<":"<<endl;
 				cout<<$5<<endl;
 				cout<<"L"<<bot<<":"<<endl;*/
+
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d:\ngoto L%d\nL%d:%s\nL%d:\n",tmp,med,top,bot,med,$5,bot);
 				
@@ -460,6 +461,9 @@ if_content : comparison AND if_content
 			}
 			|comparison OR if_content        
 			{
+				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
+				empty_string_buffer();
+				
 				int top,med,bot;
 				char* tmp;
 				char* upload;
@@ -489,6 +493,9 @@ if_content : comparison AND if_content
 			}
 			| comparison
 			{
+				sprintf(if_buffer+strlen(if_buffer),"%s",string_buffer);
+				empty_string_buffer();
+
 				tmp_stack.push($1);
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());

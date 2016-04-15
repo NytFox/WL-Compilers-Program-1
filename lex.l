@@ -27,23 +27,10 @@ void leave_scope();
 main 								{ return (MAIN);	}
 
 begin								{ 	
-										if(first_begin_skip == 1) {}
-										else
-										{
-											first_begin_skip = 0; 
-											enter_scope();
-											scope_count++;
-										}
 										return (BEGIN_E);
 									}
 
 end									{ 
-										if(scope_count == 0){}
-										else
-										{
-											leave_scope();
-											scope_count--;
-										}
 										return (END_E);
 									}					
 

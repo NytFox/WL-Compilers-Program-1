@@ -40,9 +40,10 @@ stack<int> do_stack;
 stack<char *> tmp_stack;
 stack<char *> do_tmp_stack;
 stack<char *> explist_tmp_stack;
+stack<char *> if_tmp_stack;
+char if_buffer[10000];
 
-
-char string_buffer[1000];
+char string_buffer[10000];
 int Label;
 char empty_label[]="";
 %}
