@@ -397,6 +397,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d: r28 = 0;\n%s\ngoto L%d\nL%d: r28 = 0;\n%s\nL%d: r28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
+
 			}
 			| IF '(' if_content ')' sBlock
 			{
@@ -427,6 +428,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d\nL%d: r28 = 0;\ngoto L%d\nL%d: r28 = 0;\n %s\nL%d: r28 = 0;\n",tmp,med,top,bot,med,$5,bot);
+
 				
 				
 			}
@@ -454,7 +456,7 @@ if_content : comparison AND if_content
 				tmp_stack.pop();
 				/*cout<<"  if("<<revise($3)<<") goto L"<<top<<endl;*/
 				char tmp2[1000];
-				sprintf(tmp2,"if(%s) goto L%d\n",revise(tmp),top);
+				sprintf(tmp2,"if(%s) goto L%d;\n",revise(tmp),top);
 
 				int length=strlen(tmp);
 				length+=strlen($3);
@@ -493,7 +495,7 @@ if_content : comparison AND if_content
 				tmp_stack.pop();
 				/*cout<<"  if("<<$3<<") goto L"<<med<<endl;*/
 				char tmp2[1000];
-				sprintf(tmp2,"if(%s) goto L%d\n",tmp,med);
+				sprintf(tmp2,"if(%s) goto L%d;\n",tmp,med);
 				int length=strlen(tmp);
 				length+=strlen($3);
 				length+=strlen(tmp2);
