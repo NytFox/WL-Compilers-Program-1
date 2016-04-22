@@ -1,13 +1,13 @@
 *****************************************************
 
-WL-Compilers-Program-1 Read Me
+WL-Compilers-Program-3 Read Me
 
 Author: Xinyue Wang, Li Zhang
 
 *****************************************************
 Description:
 
-	This is a simple implementation of a E language compiler.
+	This is a simple implementation of a cTran language compiler.
 
 Files:
 gram.prog						: bison file
