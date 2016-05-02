@@ -1,0 +1,158 @@
+/*  Students, this file shows you AN example of how to set up functions.
+    I've added comments to code that is Accepted by the CMachine.  That
+    "accepted" file is newHanoi.c.   As I said it IS accepted by the 
+    C machine but it seg faults when run with gcc.  That is (at least) due 
+    to problems with casts not being included.  I say at least because there 
+    MAY both other issues as well.  We'll see once I get the casts in place.
+    That shouldn't take too long but now I have to work on something else
+    for a while.  I'll send another BB Announcement once the casts are in.
+    Meanwhile if you're "compiling" this weeked this file, and the ppt
+    slides on activation record format, should keep you busy.
+
+    Oh yeah I needed to make changes to the CMachine grammar to get this 
+    far, so you might want to copy the 4650/CMachine/x650Version directory
+    and do a make clean followed by a make.  Have fun
+*/
+
+
+int r0, r1, r2, r3, r4, r5, r6, r7;
+int *iptr1;
+char *cptr1;
+char *fp, *sp;
+
+char globalData[4096];
+char moreGlobalData[4096];
+
+main()
+{
+	initstack();		# initialize sp and fp
+        goto BuildFrame1;       # goto bottom of this function so that
+				# the size of locals, temps, register save
+				# and restore will be known.  This is here
+				# (though you can use a different scheme is
+				# you like) so that you'll know how much
+				# space function needs for the stack ONLY when
+				# you get to the bottom of the function.
+
+start1:
+        printString("The solution for 4 disks is:");
+        printLine();
+       
+        r1 = 4;			# push the arguments on the stack
+        r2 = 3;			# to do that we need arg values in regs
+        r3 = 2;
+        r4 = 1; 
+        
+        pushi(r1);		# start pushing in reverse order
+        pushi(r2);
+        pushi(r3);
+        pushi(r4);
+	pushi(fp);		# after the args pushed push the CURRENT
+				# value of the frame pointer which will
+				# become the "old" frame ptr when we
+				# get into the Hanoi function 
+
+        fp = sp - 4;		# since we pushed the old fp we need to 
+				# subtract 4 from the (pushed) stack for the
+				# start of Hanoi's frame, fp
+        hanoi();
+
+        r1 = *(fp+48);		# restore the registers that you savbed above
+        r2 = *(fp+52);
+        r3 = *(fp+56);
+        r4 = *(fp+60);
+        r5 = *(fp+64);
+        r6 = *(fp+68);
+        r7 = *(fp+72);
+
+        sp = sp - 100;		# return the sp to the "top" of the previous
+				# stack from --- we're done with this one
+
+        return;			# gotta have the return here or we'd 
+				# redo the "frame building"
+BuildFrame1:
+        sp = sp + 100;		# at this point I just assuming we need 
+				# 100 butyes for our stack.  But your 
+				# compiler will figure that out for each
+				# function
+                     
+        *(fp+48) = r1;		# here's where the regs actually get stored
+        *(fp+52) = r2;
+        *(fp+56) = r3;
+        *(fp+60) = r4;
+        *(fp+64) = r5;
+        *(fp+68) = r6;
+        *(fp+72) = r7;
+
+
+        goto start1;		# having completed the init for this function
+				# return to the start of the ( in this case)
+                                # main function
+}
+
+hanoi()
+{
+
+    goto BuildFrameHanoi1;
+
+StartHanoi1:
+
+    fp = *(fp + 0);		
+    
+    r6 = 100;
+    sp = sp + r6;
+
+    r7 = *(fp - 4);
+    r6 = r7 - 1;
+    r5 = *(fp - 8);
+    r4 = *(fp - 12);
+    r3 = *(fp - 16);
+    r1 = 1;
+    if( r7 != r1) goto Else1 ;
+    
+        printString("     Move disk from ");
+        printInt(r3);
+        printString(" to ");
+        printInt(r5);
+        printLine();
+    
+Else1:
+    
+        pushi(r6);
+        pushi(r4);
+        pushi(r5);
+        pushi(r3);
+	pushi(fp);
+        r6 = 4;
+        fp = sp - r6;
+
+        hanoi();
+
+        printString("     Move disk from ");
+        printInt(r3);
+        printString(" to ");
+        printInt(r5);
+        printLine();
+
+
+        pushi(r6);
+        pushi(r5);
+        pushi(r4);
+        pushi(r3);
+        hanoi();
+        return;
+
+BuildFrameHanoi1:
+    
+        sp = sp + 100;
+                     
+        *(fp+48) = r1;
+        *(fp+52) = r2;
+        *(fp+56) = r3;
+        *(fp+60) = r4;
+        *(fp+64) = r5;
+        *(fp+68) = r6;
+        *(fp+72) = r7;
+
+        goto StartHanoi1;
+}
