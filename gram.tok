@@ -33,6 +33,8 @@ void empty_string_buffer(char *buffer);
 char* copy_buffer();
 int ReplaceStr(char *sSrc, const char *sMatchStr, const char *sReplaceStr);
 char *string_copy(char *str);
+int getParaNumber(char *para_list);
+char** return_para_list(char *para_list,int para_num);
 //global variables
 stack<char *> array_target_location;
 stack<int> if_stack;

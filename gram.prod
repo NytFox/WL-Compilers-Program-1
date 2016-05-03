@@ -67,8 +67,23 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 				return_string = string_connect(return_string,right_bracket);
 
 				$$ = return_string;
+			}
+			| ID '(' Parameter_list ')' ':' type sBlock
+			{
+				char *return_string;
+				
+				char *func_name = $1->name;
+				char double_pths[] = "()\n";
+				char left_bracket[] = "\n{\n";
+				char right_bracket[] = "\n}\n";
+				return_string = string_connect(func_name,double_pths);
+				return_string = string_connect(return_string,left_bracket);
+				return_string = string_connect(return_string,$3);
+				//return_string = string_connect(return_string,$7);
+				return_string = string_connect(return_string,$7);
+				return_string = string_connect(return_string,right_bracket);
 
-
+				$$ = return_string;
 			}
 			;
 
@@ -88,6 +103,13 @@ Parameter_list : call_id ',' Parameter_list
 				char *name = string_copy($1->name);
 				return_string = string_connect(name,next_line);
 				$$ = return_string;
+			}
+			| /* empty */
+			{
+				//cout<<"IM EMPTY PARM"<<endl;
+				char empty[]="";
+				$$=empty;
+			
 			}
 			;
 
@@ -222,7 +244,8 @@ Expression_list : Expression ',' Expression_list
 		}
 		| /* empty */
 		{
-
+			char empty[]="";
+			$$=empty;
 		}
 		;
 //************************ statement return call **************************//
@@ -244,6 +267,7 @@ statement : CALL_FUNCTION
 CALL_FUNCTION : ID '(' Expression_list ')'
 			{
 				call_function($1, $3);
+				//cout<<"paranum="<<getParaNumber($3)<<endl;
 				char *return_string = copy_buffer();
 				empty_string_buffer(string_buffer);
 
@@ -1097,7 +1121,28 @@ char* call_function(Symbol *func,char *para_list)
 	else
 	{
 		//cout<<func->name<<para_list<<";"<<endl;
-		sprintf(string_buffer + strlen(string_buffer),"%s(%s);\n",func->name,para_list);
+		int number=getParaNumber(para_list);
+		char *rt_i;
+		char *tmp;
+		char **tmp_para_list;
+		tmp_para_list=return_para_list(para_list,number);
+		stack<char *> reg_tmp_stack;
+		if(number==0)
+			sprintf(string_buffer + strlen(string_buffer),"%s();\n",func->name);
+		else{
+			for(int i=1;i<=number;i++){
+				rt_i = new_registrator();
+				reg_tmp_stack.push(rt_i);
+				sprintf(string_buffer + strlen(string_buffer),"%s=%s;\n",rt_i,tmp_para_list[i-1]);	
+		    }
+			for(int i=1;i<=number;i++){
+				tmp=reg_tmp_stack.top();
+				reg_tmp_stack.pop();
+				sprintf(string_buffer + strlen(string_buffer),"pushi(%s);\n",tmp);	
+			}
+			sprintf(string_buffer + strlen(string_buffer),"pushi(fp);\nfp=sp-4;\n%s();",func->name);	
+		}
+		
 	}
 }
 
@@ -1253,4 +1298,36 @@ char *string_copy(char *str)
 	strcpy(string,str);
 	return string;
 }
+int getParaNumber(char *para_list){
+	int num=1;
+	char * pch;
+	if(strlen(para_list)==0)
+		return 0;
+	pch=strchr(para_list,',');
+	while (pch!=NULL)
+	{
+		pch=strchr(pch+1,',');
+		num++;
+	}
+	return num;
+}
+char** return_para_list(char *para_list,int para_num){
+	const char *d=",";
+	char *p;
+	char** paraList;
+	int num=0;
+	paraList=new char*[para_num];
+	p = strtok(para_list,d);
+    while(p)
+    {
+		int len=strlen(p);
+        paraList[num]=new char[len+1];
+		strcpy(paraList[num],p);
+        p=strtok(NULL,d);
+		num++;
+    }
+	return paraList;
 
+
+
+}
