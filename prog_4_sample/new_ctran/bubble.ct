@@ -1,0 +1,63 @@
+int X[1000]
+
+main() : void
+begin
+    int i
+
+    do 10 i = 0, 999
+        X[i] = (i * 32767) % 10000
+10  continue
+
+	printString("Some of the original values are:\n")
+        printInt(X[111])
+	printString(" ")
+        printInt(X[222])
+	printString(" ")
+        printInt(X[333])
+	printString(" ")
+        printInt(X[666])
+	printString(" ")
+        printInt(X[777])
+	printString(" ")
+        printInt(X[999])
+        printLine()
+
+    printLine()
+    printLine()
+    printLine()
+
+    sort(999)
+    
+	printString("Some of the sorted values, in order are:\n")
+        printInt(X[111])
+	printString(" ")
+        printInt(X[222])
+	printString(" ")
+        printInt(X[333])
+	printString(" ")
+        printInt(X[666])
+	printString(" ")
+        printInt(X[777])
+	printString(" ")
+        printHex(X[999])
+        printLine()
+end
+
+
+sort(n) : void
+    int n
+begin
+    int i;
+    int j
+    do 200 i = 0, n-1, 1
+        do 100 j = 0, n-i-1, 1
+	    if( X[j] .gt. X[j+1] )
+            begin
+		int temp
+		temp   = X[j]
+		X[j]   = X[j+1]
+		X[j+1] = temp
+	    end
+	100 continue
+    200 continue
+end

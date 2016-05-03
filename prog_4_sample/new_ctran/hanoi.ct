@@ -1,0 +1,33 @@
+
+main() : void
+begin
+    printString("The solution for 4 disks is:")
+    printLine()
+    hanoi(1,2,3,4)
+end
+
+hanoi(x,y,z,n) : void
+    int x;
+    int y;
+    int z;
+    int n 
+begin
+    if( n .eq. 1 )
+    begin
+        printString("     Move disk from ")
+	printInt(x)
+        printString(" to ")
+	printInt(z)
+	printLine()
+    end
+    else
+    begin
+        hanoi(x,z,y,n-1)
+        printString("     Move disk from ")
+	printInt(x)
+        printString(" to ")
+	printInt(z)
+	printLine()
+        hanoi(y,x,z,n-1)
+    end
+end

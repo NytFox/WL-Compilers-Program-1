@@ -74,20 +74,12 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 
 Parameter_list : call_id ',' Parameter_list
 			{
-				char *return_string;
-				char next_line[]="\n";
-				char *name = string_copy($1->name);
-				return_string = string_connect(name,next_line);
-				return_string = string_connect(return_string,$3);
-				$$ = return_string;
+				
+				$$ = string_connect($1->name,$3);
 			}
 			| call_id
 			{
-				char *return_string;
-				char next_line[]="\n";
-				char *name = string_copy($1->name);
-				return_string = string_connect(name,next_line);
-				$$ = return_string;
+				$$ = $1->name;
 			}
 			;
 
@@ -228,8 +220,7 @@ Expression_list : Expression ',' Expression_list
 //************************ statement return call **************************//
 statement : RETURN Expression
 			{
-				char ret[]="return ";
-				$$ = string_connect(ret,$2);
+				
 			}
 			;
 //************************ function call **************************//
@@ -431,7 +422,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				sprintf(string_buffer+strlen(string_buffer),"%s",if_tmp_stack.top());
 				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
-				cout<<"TEST"<<$5<<endl;
+				cout<<"TEST"<<tmp<<med<<top<<bot<<endl;
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: r28 = 0;\n%s\ngoto L%d;\nL%d: r28 = 0;\n%s\nL%d: r28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
 
 			}
@@ -550,7 +541,7 @@ if_content : comparison AND if_content
 				//cout<<$1<<endl;
 				char tmp_push[1000];
 				char *push_level;
-				//if_tmp_stack.push(push_level); // unknown
+				if_tmp_stack.push(push_level);
 				sprintf(tmp_push,"%s",string_buffer);
 				push_level = string_copy(tmp_push);
 				if_tmp_stack.push(push_level);

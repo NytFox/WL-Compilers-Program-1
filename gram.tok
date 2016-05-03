@@ -70,6 +70,7 @@ int register_num = 0;
 %token IF
 %token ELSE
 %token CONTINUE
+%token RETURN
 %token <stringstuff> BOOL
 
 
@@ -116,3 +117,5 @@ int register_num = 0;
 %type <stringstuff> type
 %type <stringstuff> statement_list
 %type <stringstuff> do_list
+%type <stringstuff> CALL_FUNCTION
+

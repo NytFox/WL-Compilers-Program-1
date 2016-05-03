@@ -27,10 +27,12 @@ void leave_scope();
 main 								{ return (MAIN);	}
 
 begin								{ 	
+										enter_scope();
 										return (BEGIN_E);
 									}
 
 end									{ 
+										leave_scope();
 										return (END_E);
 									}					
 
@@ -44,6 +46,7 @@ if									{ fflush(stdout); return (IF);	}
 else								{ fflush(stdout); return (ELSE);	}
 do									{ fflush(stdout); return (DO);	}
 continue							{ fflush(stdout); return (CONTINUE);	}
+return								{ fflush(stdout); return (RETURN);	}
 
 and									{ fflush(stdout); return (AND);	}
 or 									{ fflush(stdout); return (OR);	}
