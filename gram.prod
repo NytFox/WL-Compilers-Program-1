@@ -32,6 +32,7 @@ FuncList : Function FuncList
 		}
 		| Function 
 		{
+
 			$$ = $1;
 		}
 		;
@@ -39,6 +40,8 @@ FuncList : Function FuncList
 
 Function :  MAIN  '(' ')' ':' VOID sBlock
 			{
+
+				leave_scope();
 				char *return_string;
 
 				char main_string[]="main()\n";
@@ -48,11 +51,12 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 				return_string = string_connect(main_string,left_bracket);
 				return_string = string_connect(return_string,$6);
 				return_string = string_connect(return_string,right_bracket);
-
+				
 				$$ = return_string;
 			}
 			| ID '(' Parameter_list ')' ':' type declaration sBlock
 			{
+				leave_scope();
 				parameter_fp_count = 0;
 				//part for para+type+declaration
 				char rg_tmp[1000];
@@ -65,32 +69,59 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 					}
 				
 				char *return_string;
-				char *func_name = $1->name;
+				char *func_name = string_copy($1->name);
 				char double_pths[] = "()\n";
 				char left_bracket[] = "\n{\n";
 				char right_bracket[] = "\n}\n";
+				
+				char function_start_part[1000];
+				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
+				char function_buildframe_part[5000];
+				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
+				for(int i=1;i<=28;i++)
+				{
+					int fp_move = 48 + (i-1)*4;
+					sprintf(function_buildframe_part+strlen(function_buildframe_part),"*(fp+%d)=r%d;\n",fp_move,i);
+				}
+				
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
+				return_string = string_connect(return_string,function_start_part);
 				return_string = string_connect(return_string,rg_tmp);
 				//return_string = string_connect(return_string,$7);
 				return_string = string_connect(return_string,$8);
+				return_string = string_connect(return_string,function_buildframe_part);
 				return_string = string_connect(return_string,right_bracket);
 
 				$$ = return_string;
 			}
 			| ID '(' Parameter_list ')' ':' type sBlock
 			{
+				leave_scope();
 				char *return_string;
 				
-				char *func_name = $1->name;
+				char *func_name = string_copy($1->name);
 				char double_pths[] = "()\n";
 				char left_bracket[] = "\n{\n";
 				char right_bracket[] = "\n}\n";
+				
+				char function_start_part[1000];
+				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
+				char function_buildframe_part[5000];
+				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
+				for(int i=1;i<=28;i++)
+				{
+					int fp_move = 48 + (i-1)*4;
+					sprintf(function_buildframe_part+strlen(function_buildframe_part),"*(fp+%d)=r%d;\n",fp_move,i);
+				}
+				
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
+				return_string = string_connect(return_string,function_start_part);
 				return_string = string_connect(return_string,$3);
 				//return_string = string_connect(return_string,$7);
 				return_string = string_connect(return_string,$7);
+				return_string = string_connect(return_string,function_buildframe_part);
 				return_string = string_connect(return_string,right_bracket);
 
 				$$ = return_string;
@@ -99,42 +130,18 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 
 Parameter_list : call_id ',' Parameter_list
 			{
-				// char *return_string;
-				// char rg_tmp[100];
-				// int type;
-				// if(strcmp($1->type,"int")==0)
-				// 	type = 4;
-				// else if(strcmp($1->type,"char")==0)
-				// 		type = 1;
-				// int stack_depth = type + parameter_fp_count;
-				// sprintf(rg_tmp,"r%d=*(fp-%d);\n",$1->offset,stack_depth);
-				// parameter_fp_count += type;
-				// return_string = string_copy(rg_tmp);
-				// return_string = string_connect(return_string,$3);
 				parameter_list_stack.push($1);
 				$$ = empty_label;
 			}
 			| call_id
 			{
-				// char *return_string;
-				// char rg_tmp[100];
-				// int type;
-				// if(strcmp($1->type,"int")==0)
-				// 	type = 4;
-				// else if(strcmp($1->type,"char")==0)
-				// 		type = 1;
-				// sprintf(rg_tmp,"r%d=*(fp-%d);\n",$1->offset,type);
-				// parameter_fp_count += type;
-				// return_string = string_copy(rg_tmp);
-				
 				parameter_list_stack.push($1);
 				$$ = empty_label;
 			}
 			| /* empty */
 			{
 				//cout<<"IM EMPTY PARM"<<endl;
-				char empty[]="";
-				$$=empty;
+				$$=empty_label;
 			
 			}
 			;
@@ -148,7 +155,6 @@ declaration : declaration_item ';' declaration
 			| declaration_item
 			{
 				//printf("\nSeen single declaration;\n\n");
-
 			}
 			;
 
@@ -270,22 +276,39 @@ Expression_list : Expression ',' Expression_list
 		}
 		| /* empty */
 		{
-			char empty[]="";
-			$$=empty;
+			$$=empty_label;
 		}
 		;
 //************************ statement return call **************************//
 statement : RETURN Expression
 			{
-				char ret[]="return ";
-				$$ = string_connect(ret,$2);
+				//cout<<"TEST: "<<$2<<endl;
+				char *return_string = copy_buffer();
+				
+				char return_statement[1000];
+				if(strcmp("",string_copy($2))==0)
+				{
+					sprintf(return_statement,"return;\n");
+				}
+				else
+				{
+					//cout<<"TEST: "<<$2<<endl;
+					sprintf(return_statement,"r0=%s;\nreturn;\n",string_copy($2));
+				}
+				empty_string_buffer(string_buffer);
+				
+				$$ = string_connect(return_string,return_statement);
+				//cout<<"TEST2: "<<$$<<endl;
 			}
 			;
 //************************ function call **************************//
 
 statement : CALL_FUNCTION
 			{
-				$$ = $1;
+				char *return_string = copy_buffer();
+				empty_string_buffer(string_buffer);
+
+				$$ = return_string;
 			}
 			;
 
@@ -294,15 +317,7 @@ CALL_FUNCTION : ID '(' Expression_list ')'
 			{
 				call_function($1, $3);
 				//cout<<"paranum="<<getParaNumber($3)<<endl;
-				char *return_string = copy_buffer();
-				empty_string_buffer(string_buffer);
-
-				while(!explist_tmp_stack.empty())
-					{
-						explist_tmp_stack.pop();
-					}
-
-				$$ = return_string;
+				$$ = empty_label;
 			}
 			;
 
@@ -445,9 +460,10 @@ do_end : INTLITERAL CONTINUE
 statement : if_statement
 			{
 				//cout<<$1<<endl;
-
+				
 				char *return_string;
 				return_string = copy_buffer();
+				//cout<<"TEST :"<<string_buffer<<endl;
 				empty_string_buffer(string_buffer);
 				$$ = return_string;
 			}
@@ -481,7 +497,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				sprintf(string_buffer+strlen(string_buffer),"%s",if_tmp_stack.top());
 				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
-				cout<<"TEST"<<$5<<endl;
+				//cout<<"TEST"<<$5<<endl;				
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: r28 = 0;\n%s\ngoto L%d;\nL%d: r28 = 0;\n%s\nL%d: r28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
 
 			}
@@ -605,13 +621,12 @@ if_content : comparison AND if_content
 				push_level = string_copy(tmp_push);
 				if_tmp_stack.push(push_level);
 				empty_string_buffer(string_buffer);
-
+				
 				tmp_stack.push($1);
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());
 				if_stack.push(assign_next_lable());
-				char empty[]="";
-				$$=empty;
+				$$=empty_label;
 			}
 			;
 
@@ -760,6 +775,7 @@ term : 	term '*' factor
 
 		    char *rd = new_registrator();
 		    cal_operation('*',$1,$3,rd);
+			
 		    $$ = rd;
 		}
 		| term '/' factor 
@@ -795,6 +811,7 @@ factor 	: factor EXPO parentheses
 
 parentheses : '(' Expression ')' 
 		{ 
+			
 			$$ = $2;	
 		}
 		| call_id
@@ -828,7 +845,8 @@ parentheses : '(' Expression ')'
 		}
 		| CALL_FUNCTION
 		{
-			$$ = $1;
+			char return_registrator[]="r0";
+			$$ = string_copy(return_registrator);
 		}
 		;
 
@@ -1092,7 +1110,7 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 	{
 		//cout<< target << " = ";
 		sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
-
+		
 		//cout<< "T2"<<endl;
 		switch(oprator)
 		{
@@ -1109,6 +1127,7 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 			case '*':{
 				//cout<<left<<"*"<<right;
 				sprintf(string_buffer + strlen(string_buffer),"%s*%s",left,right);
+				
 				break;
 			}
 			case '/':{
@@ -1126,19 +1145,19 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 char* call_function(Symbol *func,char *para_list)
 {
 	// system functions
-	if(strcmp(func->name,"printi")==0)
+	if(strcmp(func->name,"printi")==0 || strcmp(func->name,"printInt")==0)
 		{
 			//cout<<"printInt(r"<<para_list<<");"<<endl;
 			sprintf(string_buffer + strlen(string_buffer),"printInt(%s);\n",para_list);
 		}
 	else
-	if(strcmp(func->name,"printLine")==0)
+	if(strcmp(func->name,"printLine")==0 )
 		{
 			//cout<<"printline();"<<endl;
 			sprintf(string_buffer + strlen(string_buffer),"printline();\n");
 		}
 	else
-	if(strcmp(func->name,"prints")==0)
+	if(strcmp(func->name,"prints")==0 || strcmp(func->name,"printString")==0)
 		{
 			//cout<<"printline();"<<endl;
 			sprintf(string_buffer + strlen(string_buffer),"printString(%s);\n",para_list);
@@ -1166,7 +1185,7 @@ char* call_function(Symbol *func,char *para_list)
 				reg_tmp_stack.pop();
 				sprintf(string_buffer + strlen(string_buffer),"pushi(%s);\n",tmp);	
 			}
-			sprintf(string_buffer + strlen(string_buffer),"pushi(fp);\nfp=sp-4;\n%s();",func->name);	
+			sprintf(string_buffer + strlen(string_buffer),"pushi(fp);\nfp=sp-4;\n%s();\n",func->name);	
 		}
 		
 	}

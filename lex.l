@@ -14,9 +14,10 @@ extern "C"
 #include "y.tab.h"
 #include <iostream>
 using namespace std;
-int first_begin_skip = 1;
+int begin_skip = 0;
 int scope_count = 0;
 void process_id();
+int register_number = 1;
 int assign_next_register();
 void enter_scope();
 void leave_scope();
@@ -27,12 +28,15 @@ void leave_scope();
 main 								{ return (MAIN);	}
 
 begin								{ 	
-										enter_scope();
+										if(begin_skip == 0)
+											{
+												enter_scope();
+											}
+									
 										return (BEGIN_E);
 									}
 
 end									{ 
-										leave_scope();
 										return (END_E);
 									}					
 
@@ -120,11 +124,14 @@ void process_id()
 void enter_scope()
 {
 	new_table->Enter_new_scope();
+	begin_skip = 1;
 }
 
 void leave_scope()
 {
 	new_table->Leave_current_scope();
+	register_number = 1;
+	begin_skip = 0;
 }
 
 int assign_next_register()
@@ -133,8 +140,14 @@ int assign_next_register()
            register.  This routine just chooses the next register in
            the range r4 to r31.  Registers r0-r3 are reserved for other
            purposes  */
-
-	static int register_number;
-	register_number = (register_number + 1) % 28;
+    if(register_number==0 || register_number==28)
+	{
+		register_number = 1;
+	}
+	else
+	{
+		register_number = (register_number + 1) % 28;
+	}
+	//cout<<"TEST: "<<register_number<<endl;
 	return register_number;
 }
