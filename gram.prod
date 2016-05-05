@@ -68,6 +68,7 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 					int fp_move = 48 + (i-1)*4;
 					sprintf(function_buildframe_part+strlen(function_buildframe_part),"*(fp+%d)=r%d;\n",fp_move,i);
 				}
+				sprintf(function_buildframe_part+strlen(function_buildframe_part),"goto Start%s1;\n",func_name);
 				
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
@@ -95,12 +96,16 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 					sprintf(function_start_part,"initstack();\n");
 				sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
+				if (strcmp("main",func_name)==0)
+					sprintf(function_buildframe_part+strlen(function_buildframe_part),"return;\n",func_name);
 				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
 				for(int i=1;i<=28;i++)
 				{
 					int fp_move = 48 + (i-1)*4;
 					sprintf(function_buildframe_part+strlen(function_buildframe_part),"*(fp+%d)=r%d;\n",fp_move,i);
 				}
+				sprintf(function_buildframe_part+strlen(function_buildframe_part),"goto Start%s1;\n",func_name);
+				
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
 				return_string = string_connect(return_string,function_start_part);
