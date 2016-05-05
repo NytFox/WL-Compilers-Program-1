@@ -293,6 +293,7 @@ statement : RETURN Expression
 statement : CALL_FUNCTION
 			{
 				char *return_string = copy_buffer();
+				
 				empty_string_buffer(string_buffer);
 
 				$$ = return_string;
@@ -832,8 +833,9 @@ parentheses : '(' Expression ')'
 		}
 		| CALL_FUNCTION
 		{
-			char return_registrator[]="r0";
-			$$ = string_copy(return_registrator);
+			char *rd = new_registrator();
+			sprintf(string_buffer+strlen(string_buffer),"%s=r0;\n",rd);
+			$$ = rd;
 		}
 		;
 
@@ -1066,7 +1068,7 @@ char* cal_operation(char oprator,const char *left, const char *right, const char
 		/*cout<< rd_1 <<" = " << a <<endl;
 		cout<< rd_2 <<" = " << b <<endl;
 		cout<< target << " = ";*/
-		sprintf(string_buffer + strlen(string_buffer),"%s = %d\n%s = %d\n%s = ",rd_1,a,rd_2,b,target);
+		sprintf(string_buffer + strlen(string_buffer),"%s = %d;\n%s = %d;\n%s = ",rd_1,a,rd_2,b,target);
 
 		switch(oprator)
 		{
