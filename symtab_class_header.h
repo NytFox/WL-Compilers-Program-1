@@ -29,8 +29,10 @@ public:
 	 	Attributes
 		Add new attributes to the end
 	*/
-	const char *type;							// variable type
+	const char *type;						// variable type
 	const char* value;						// variable value
+	int type_size;
+	//if is an array
 	int if_array;
 	int array_location;
 };

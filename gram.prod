@@ -53,15 +53,25 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 			}
 			| ID '(' Parameter_list ')' ':' type declaration sBlock
 			{
-				char *return_string;
+				parameter_fp_count = 0;
+				//part for para+type+declaration
+				char rg_tmp[1000];
+				while(!parameter_list_stack.empty())
+					{
+						Symbol *tmp_symbol = parameter_list_stack.top();
+						sprintf(rg_tmp+strlen(rg_tmp),"r%d=*(fp-%d);\n",tmp_symbol->offset,tmp_symbol->type_size+parameter_fp_count);
+						parameter_fp_count += tmp_symbol->type_size;
+						parameter_list_stack.pop();
+					}
 				
+				char *return_string;
 				char *func_name = $1->name;
 				char double_pths[] = "()\n";
 				char left_bracket[] = "\n{\n";
 				char right_bracket[] = "\n}\n";
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
-				return_string = string_connect(return_string,$3);
+				return_string = string_connect(return_string,rg_tmp);
 				//return_string = string_connect(return_string,$7);
 				return_string = string_connect(return_string,$8);
 				return_string = string_connect(return_string,right_bracket);
@@ -89,20 +99,36 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 
 Parameter_list : call_id ',' Parameter_list
 			{
-				char *return_string;
-				char next_line[]="\n";
-				char *name = string_copy($1->name);
-				return_string = string_connect(name,next_line);
-				return_string = string_connect(return_string,$3);
-				$$ = return_string;
+				// char *return_string;
+				// char rg_tmp[100];
+				// int type;
+				// if(strcmp($1->type,"int")==0)
+				// 	type = 4;
+				// else if(strcmp($1->type,"char")==0)
+				// 		type = 1;
+				// int stack_depth = type + parameter_fp_count;
+				// sprintf(rg_tmp,"r%d=*(fp-%d);\n",$1->offset,stack_depth);
+				// parameter_fp_count += type;
+				// return_string = string_copy(rg_tmp);
+				// return_string = string_connect(return_string,$3);
+				parameter_list_stack.push($1);
+				$$ = empty_label;
 			}
 			| call_id
 			{
-				char *return_string;
-				char next_line[]="\n";
-				char *name = string_copy($1->name);
-				return_string = string_connect(name,next_line);
-				$$ = return_string;
+				// char *return_string;
+				// char rg_tmp[100];
+				// int type;
+				// if(strcmp($1->type,"int")==0)
+				// 	type = 4;
+				// else if(strcmp($1->type,"char")==0)
+				// 		type = 1;
+				// sprintf(rg_tmp,"r%d=*(fp-%d);\n",$1->offset,type);
+				// parameter_fp_count += type;
+				// return_string = string_copy(rg_tmp);
+				
+				parameter_list_stack.push($1);
+				$$ = empty_label;
 			}
 			| /* empty */
 			{
@@ -1149,6 +1175,10 @@ char* call_function(Symbol *func,char *para_list)
 void assign_variable_type(char *type,Symbol *id)
 {
 	id->type = string_copy(type);
+	if(strcmp(type,"char")==0)
+		id->type_size = 1;
+	else if(strcmp(type,"int")==0)
+		id->type_size = 4;
 }
 
 char* string_connect(char *a, char *b)
