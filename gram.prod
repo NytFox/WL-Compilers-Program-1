@@ -38,23 +38,7 @@ FuncList : Function FuncList
 		;
 
 
-Function :  MAIN  '(' ')' ':' VOID sBlock
-			{
-
-				leave_scope();
-				char *return_string;
-
-				char main_string[]="main()\n";
-				char left_bracket[] = "\n{\n";
-				char right_bracket[] = "\n}\n";
-
-				return_string = string_connect(main_string,left_bracket);
-				return_string = string_connect(return_string,$6);
-				return_string = string_connect(return_string,right_bracket);
-				
-				$$ = return_string;
-			}
-			| ID '(' Parameter_list ')' ':' type declaration sBlock
+Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 			{
 				leave_scope();
 				parameter_fp_count = 0;
@@ -75,6 +59,7 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 				char right_bracket[] = "\n}\n";
 				
 				char function_start_part[1000];
+				
 				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
 				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
@@ -106,7 +91,9 @@ Function :  MAIN  '(' ')' ':' VOID sBlock
 				char right_bracket[] = "\n}\n";
 				
 				char function_start_part[1000];
-				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
+				if (strcmp("main",func_name)==0)
+					sprintf(function_start_part,"initstack();\n");
+				sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
 				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
 				for(int i=1;i<=28;i++)
@@ -1186,6 +1173,12 @@ char* call_function(Symbol *func,char *para_list)
 				sprintf(string_buffer + strlen(string_buffer),"pushi(%s);\n",tmp);	
 			}
 			sprintf(string_buffer + strlen(string_buffer),"pushi(fp);\nfp=sp-4;\n%s();\n",func->name);	
+			for(int i=1;i<=28;i++)
+				{
+					int fp_move = 48 + (i-1)*4;
+					sprintf(string_buffer + strlen(string_buffer),"r%d=*(fp+%d);\n",i,fp_move);
+				}
+			sprintf(string_buffer + strlen(string_buffer),"sp=sp-200;\n");
 		}
 		
 	}

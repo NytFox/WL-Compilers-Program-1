@@ -64,7 +64,7 @@ int register_num = 0;
 }
 
 
-%token MAIN
+
 %token BEGIN_E
 %token END_E
 %token EXPO

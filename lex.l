@@ -25,7 +25,6 @@ void leave_scope();
 %}
 
 %%
-main 								{ return (MAIN);	}
 
 begin								{ 	
 										if(begin_skip == 0)
