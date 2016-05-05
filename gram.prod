@@ -101,7 +101,6 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 					int fp_move = 48 + (i-1)*4;
 					sprintf(function_buildframe_part+strlen(function_buildframe_part),"*(fp+%d)=r%d;\n",fp_move,i);
 				}
-				
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
 				return_string = string_connect(return_string,function_start_part);
@@ -181,27 +180,33 @@ arraycontent : INTLITERAL ',' arraycontent
 type		: INT
 			{
 				char integer[]="int";
-				$$ = integer;
+				$$ = string_copy(integer);
 			}
 			| CHAR
 			{
 				char charactor[]="char";
-				$$ = charactor;
+				$$ = string_copy(charactor);
 			}
 			| LONG
 			{
 				char long_integer[]="long";
-				$$ = long_integer;
+				$$ = string_copy(long_integer);
 			}
 			| BOOL
 			{
-				char bool_type[]="bool";
-				$$ = bool_type;
+				char bool_type[]="boolean";
+				$$ = string_copy(bool_type);
 			}
 			| VOID
 			{
 				
 			}
+			| UNSIGNED
+			{
+				char unsigned_type[]="unsigned";
+				$$ = string_copy(unsigned_type);
+			}
+			
 			;
 
 
@@ -713,20 +718,32 @@ comparison : Expression '.' GT '.' Expression
 Expression : Expression bit_operation BitTerm
 		{
 			//cout<<"EXP BIT"<<endl;
+			char *rd = new_registrator();
+		    cal_operation_bit($2,$1,$3,rd);
+		    $$ = rd;
+		}
+		| bit_operation BitTerm
+		{
+			char *rd = new_registrator();
+			cal_operation_bit($1,$2,rd);
+			$$ = rd;
 		}
 		| BitTerm
 		{
 			//cout<<"EXP"<<endl;
+			$$ = $1;
 		}
 		;
 
 BitTerm : BitTerm Shift_operation ShiftTerm
 		{
-
+			char *rd = new_registrator();
+		    cal_operation_shift($2,$1,$3,rd);
+		    $$ = rd;
 		}
 		| ShiftTerm
 		{
-
+			$$ = $1;
 		}
 		;
 
@@ -912,25 +929,35 @@ call_id : ID '[' Expression_list ']'
 
 Shift_operation : LEFT_SHIFT
 				{
-
+					char left_shift[]="<<";
+					$$ = string_copy(left_shift);
 				}
 				| RIGHT_SHIFT
 				{
-
+					char right_shift[]=">>";
+					$$ = string_copy(right_shift);
 				}
 				;
 
 bit_operation : '^'
 			{
-
+				char bit_xor[]=" ^ ";
+				$$ = string_copy(bit_xor);
 			}
 			| '|'
 			{
-
+				char bit_or[]=" | ";
+				$$ = string_copy(bit_or);
 			}
 			| '&'
 			{
-
+				char bit_and[]=" & ";
+				$$ = string_copy(bit_and);
+			}
+			| '~'
+			{
+				char bit_not[]=" ~ ";
+				$$ = string_copy(bit_not);
 			}
 			;
 
@@ -1053,6 +1080,30 @@ bool is_number(const char *string)
 	return 1;
 }
 
+char* cal_operation_bit(char *oprator,const char *right, const char *target)
+{
+
+	sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
+	sprintf(string_buffer + strlen(string_buffer),"%s%s;\n",oprator,right);
+		
+}
+
+char* cal_operation_bit(char *oprator,const char *left, const char *right, const char *target)
+{
+
+	sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
+	sprintf(string_buffer + strlen(string_buffer),"%s%s%s;\n",left,oprator,right);
+		
+}
+
+char* cal_operation_shift(char *oprator,const char *left, const char *right, const char *target)
+{
+
+	sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
+	sprintf(string_buffer + strlen(string_buffer),"%s%s%s;\n",left,oprator,right);
+		
+}
+
 char* cal_operation(char oprator,const char *left, const char *right, const char *target)
 {
 	int temp;
@@ -1150,6 +1201,18 @@ char* call_function(Symbol *func,char *para_list)
 		{
 			//cout<<"printline();"<<endl;
 			sprintf(string_buffer + strlen(string_buffer),"printString(%s);\n",para_list);
+		}
+	else
+	if(strcmp(func->name,"readInt")==0)
+		{
+			//cout<<"printline();"<<endl;
+			sprintf(string_buffer + strlen(string_buffer),"readInt(%s);\n",para_list);
+		}
+	else
+	if(strcmp(func->name,"printHex")==0)
+		{
+			//cout<<"printline();"<<endl;
+			sprintf(string_buffer + strlen(string_buffer),"printHex(%s);\n",para_list);
 		}
 	// custom functions
 	else

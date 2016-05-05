@@ -42,9 +42,10 @@ end									{
 int									{ fflush(stdout); return (INT);	}
 char								{ fflush(stdout); return (CHAR);	}
 void 								{ fflush(stdout); return (VOID);	}
-bool								{ fflush(stdout); return (BOOL);	}
+boolean								{ fflush(stdout); return (BOOL);	}
 long								{ fflush(stdout); return (LONG);	}
 enum								{ fflush(stdout); return (ENUM);	}
+unsigned							{ fflush(stdout); return (UNSIGNED);	}		
 if									{ fflush(stdout); return (IF);	}
 else								{ fflush(stdout); return (ELSE);	}
 do									{ fflush(stdout); return (DO);	}
@@ -88,6 +89,7 @@ L?\"(\\.|[^\\"])*\"					{ yylval.stringstuff = yytext; return(STRING_LITERAL); }
 '^'									{ return ('^');		}
 '|'									{ return ('|');		}
 '&'									{ return ('&');		}
+'~'									{ return ('~');		}
 %%
 
 void process_id()
