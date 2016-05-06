@@ -9,7 +9,7 @@ main() : void
 begin
     printString("Please enter non-negative integer values")
     printLine()
-    do 100 i = 1, 100, 1
+    do 100 i = 1, 10, 1
 	readInt(&element)
         word = element / 1024
         bit = element % 1024

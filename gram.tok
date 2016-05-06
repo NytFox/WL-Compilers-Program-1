@@ -22,8 +22,8 @@ char *get_number(int num);
 bool is_number(const char *string);
 char* cal_operation(char oprator,const char *left, const char *right,const char *target);
 char* cal_operation_shift(char *oprator,const char *left, const char *right, const char *target);
-char* cal_operation_bit(char *oprator,const char *left, const char *right, const char *target);
-char* cal_operation_bit(char *oprator,const char *right, const char *target);
+char* cal_operation_bit(char oprator,const char *left, const char *right, const char *target);
+char* cal_operation_bit_2(char oprator,const char *right, const char *target);
 extern int assign_next_register();
 extern void enter_scope();
 extern void leave_scope();
@@ -54,6 +54,8 @@ char string_buffer[50000];
 char return_buffer[50000];
 int Label;
 char empty_label[]="";
+char two_para[]="2";
+char three_para[]="3";
 int parameter_fp_count = 0;
 
 int register_num = 0;
@@ -76,13 +78,13 @@ int register_num = 0;
 %token <stringstuff> LONG
 %token ENUM
 %token VOID
-%token UNSIGNED
+%token <stringstuff> UNSIGNED
 %token DO
 %token IF
 %token ELSE
 %token CONTINUE
 %token RETURN
-%token <stringstuff> BOOL
+%token <stringstuff> BOOLEAN
 
 
 %token <stringstuff> AND
@@ -122,8 +124,6 @@ int register_num = 0;
 %type <stringstuff> Expression_list
 %type <stringstuff> ShiftTerm
 %type <stringstuff> BitTerm
-%type <stringstuff> Shift_operation
-%type <stringstuff> bit_operation
 %type <stringstuff> Program_Initialization
 %type <stringstuff> type
 %type <stringstuff> statement_list

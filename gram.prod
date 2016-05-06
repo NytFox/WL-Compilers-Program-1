@@ -93,12 +93,13 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				
 				char function_start_part[1000];
 				if (strcmp("main",func_name)==0)
-					sprintf(function_start_part,"initstack();\n");
-				sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
+					sprintf(function_start_part,"initstack();\ngoto BuildFramemain1;\nStartmain1:\n");
+				else
+					sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
 				if (strcmp("main",func_name)==0)
-					sprintf(function_buildframe_part+strlen(function_buildframe_part),"return;\n",func_name);
-				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
+					sprintf(function_buildframe_part,"return;\n",func_name);
+				sprintf(function_buildframe_part+strlen(function_buildframe_part),"BuildFrame%s1:\nsp=sp+200;\n",func_name);
 				for(int i=1;i<=28;i++)
 				{
 					int fp_move = 48 + (i-1)*4;
@@ -197,7 +198,7 @@ type		: INT
 				char long_integer[]="long";
 				$$ = string_copy(long_integer);
 			}
-			| BOOL
+			| BOOLEAN
 			{
 				char bool_type[]="boolean";
 				$$ = string_copy(bool_type);
@@ -279,7 +280,7 @@ Expression_list : Expression ',' Expression_list
 //************************ statement return call **************************//
 statement : RETURN Expression
 			{
-				//cout<<"TEST: "<<$2<<endl;
+
 				char *return_string = copy_buffer();
 				
 				char return_statement[1000];
@@ -289,13 +290,13 @@ statement : RETURN Expression
 				}
 				else
 				{
-					//cout<<"TEST: "<<$2<<endl;
+				
 					sprintf(return_statement,"r0=%s;\nreturn;\n",string_copy($2));
 				}
 				empty_string_buffer(string_buffer);
 				
 				$$ = string_connect(return_string,return_statement);
-				//cout<<"TEST2: "<<$$<<endl;
+
 			}
 			;
 //************************ function call **************************//
@@ -316,6 +317,10 @@ CALL_FUNCTION : ID '(' Expression_list ')'
 				call_function($1, $3);
 				//cout<<"paranum="<<getParaNumber($3)<<endl;
 				$$ = empty_label;
+				while(!explist_tmp_stack.empty())
+				{
+					explist_tmp_stack.pop();
+				}
 			}
 			;
 
@@ -323,11 +328,12 @@ CALL_FUNCTION : ID '(' Expression_list ')'
 
 statement  : call_id '=' Expression
 		{ 
+			
 			if($1->if_array == 1)
 			{
 				char *array_target = array_target_location.top();
 				array_target_location.pop();
-
+				
 				sprintf(string_buffer + strlen(string_buffer),"%s=%s;\n",array_target,$3);
 
 			}
@@ -426,8 +432,7 @@ do_list : Expression ',' Expression
 		
 			do_tmp_stack.push($3);
 			do_tmp_stack.push($1);
-
-			char two_para[]="2";
+			
 			$$ = two_para;
 		}
 		| Expression ',' Expression ',' Expression
@@ -437,7 +442,6 @@ do_list : Expression ',' Expression
 			do_tmp_stack.push($3);
 			do_tmp_stack.push($1);
 
-			char three_para[]="3";
 			$$ = three_para;
 		}
 		;
@@ -461,7 +465,7 @@ statement : if_statement
 				
 				char *return_string;
 				return_string = copy_buffer();
-				//cout<<"TEST :"<<string_buffer<<endl;
+
 				empty_string_buffer(string_buffer);
 				$$ = return_string;
 			}
@@ -495,7 +499,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				sprintf(string_buffer+strlen(string_buffer),"%s",if_tmp_stack.top());
 				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
-				//cout<<"TEST"<<$5<<endl;				
+				
 				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: r28 = 0;\n%s\ngoto L%d;\nL%d: r28 = 0;\n%s\nL%d: r28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
 
 			}
@@ -720,30 +724,60 @@ comparison : Expression '.' GT '.' Expression
 //************************ Expression Calculation **************************//
 
 
-Expression : Expression bit_operation BitTerm
+Expression : Expression '&' BitTerm
+		{
+			
+			//cout<<"EXP BIT"<<endl;
+			char *rd = new_registrator();
+		    cal_operation_bit('&',$1,$3,rd);
+		    $$ = rd;
+		}
+		| Expression '|' BitTerm
 		{
 			//cout<<"EXP BIT"<<endl;
 			char *rd = new_registrator();
-		    cal_operation_bit($2,$1,$3,rd);
+		    cal_operation_bit('|',$1,$3,rd);
 		    $$ = rd;
 		}
-		| bit_operation BitTerm
+		| Expression '^' BitTerm
+		{
+			//cout<<"EXP BIT"<<endl;
+			char *rd = new_registrator();
+		    cal_operation_bit('^',$1,$3,rd);
+		    $$ = rd;
+		}
+		| '&' BitTerm
 		{
 			char *rd = new_registrator();
-			cal_operation_bit($1,$2,rd);
+			cal_operation_bit_2('&',$2,rd);
+			$$ = rd;
+		}
+		| '~' BitTerm
+		{
+			char *rd = new_registrator();
+			cal_operation_bit_2('~',$2,rd);
 			$$ = rd;
 		}
 		| BitTerm
 		{
-			//cout<<"EXP"<<endl;
 			$$ = $1;
 		}
 		;
 
-BitTerm : BitTerm Shift_operation ShiftTerm
+BitTerm : BitTerm LEFT_SHIFT ShiftTerm
 		{
+			char left_shift[]="<<";
+			char *tmp = string_copy(left_shift);
 			char *rd = new_registrator();
-		    cal_operation_shift($2,$1,$3,rd);
+		    cal_operation_shift(tmp,$1,$3,rd);
+		    $$ = rd;
+		}
+		| BitTerm RIGHT_SHIFT ShiftTerm
+		{
+			char left_shift[]=">>";
+			char *tmp = string_copy(left_shift);
+			char *rd = new_registrator();
+		    cal_operation_shift(tmp,$1,$3,rd);
 		    $$ = rd;
 		}
 		| ShiftTerm
@@ -796,6 +830,14 @@ term : 	term '*' factor
 		    cal_operation('/',$1,$3,rd);
 		    $$ = rd;
 		}
+		| term '%' factor 
+		{
+		     //printf("\nSeen MUL_OP \n\n"); 
+
+		    char *rd = new_registrator();
+		    cal_operation('%',$1,$3,rd);
+		    $$ = rd;
+		}
 	   	| factor
 		{ 
 		    // printf("Seen: FACTOR \n"); 
@@ -831,7 +873,6 @@ parentheses : '(' Expression ')'
 			{
 				char *array_target = array_target_location.top();
 				array_target_location.pop();
-
 				char *array_acceptor = new_registrator();
 				sprintf(string_buffer + strlen(string_buffer),"%s = %s;\n",array_acceptor, array_target);
 
@@ -864,7 +905,7 @@ parentheses : '(' Expression ')'
 call_id : ID '[' Expression_list ']'
 		{
 			
-				if(strcmp($1->type,"int")==0)
+				if(strcmp($1->type,"int")==0 || strcmp($1->type,"unsigned")==0)
 				{
 
 					char init_part[1000];
@@ -886,12 +927,11 @@ call_id : ID '[' Expression_list ']'
 
 					sprintf(init_part + strlen(init_part),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,init,total_shift,data_shift,$1->array_location);
 					sprintf(target_part,"*(int_array+%s)",total_shift);
-
 					sprintf(string_buffer + strlen(string_buffer),"%s",init_part);
 
 					char *push_target;
 					push_target = string_copy(target_part);
-					array_target_location.push(target_part);
+					array_target_location.push(push_target);
 
 				}
 				else if(strcmp($1->type,"char")==0)
@@ -920,7 +960,7 @@ call_id : ID '[' Expression_list ']'
 
 					char *push_target;
 					push_target = string_copy(target_part);
-					array_target_location.push(target_part);
+					array_target_location.push(push_target);
 				}
 
 
@@ -931,40 +971,6 @@ call_id : ID '[' Expression_list ']'
 			$$ = $1;
 		}
 		;
-
-Shift_operation : LEFT_SHIFT
-				{
-					char left_shift[]="<<";
-					$$ = string_copy(left_shift);
-				}
-				| RIGHT_SHIFT
-				{
-					char right_shift[]=">>";
-					$$ = string_copy(right_shift);
-				}
-				;
-
-bit_operation : '^'
-			{
-				char bit_xor[]=" ^ ";
-				$$ = string_copy(bit_xor);
-			}
-			| '|'
-			{
-				char bit_or[]=" | ";
-				$$ = string_copy(bit_or);
-			}
-			| '&'
-			{
-				char bit_and[]=" & ";
-				$$ = string_copy(bit_and);
-			}
-			| '~'
-			{
-				char bit_not[]=" ~ ";
-				$$ = string_copy(bit_not);
-			}
-			;
 
 %%
 
@@ -1085,19 +1091,18 @@ bool is_number(const char *string)
 	return 1;
 }
 
-char* cal_operation_bit(char *oprator,const char *right, const char *target)
+char* cal_operation_bit_2(char oprator,const char *right, const char *target)
 {
-
 	sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
-	sprintf(string_buffer + strlen(string_buffer),"%s%s;\n",oprator,right);
+	sprintf(string_buffer + strlen(string_buffer),"%c%s;\n",oprator,right);
+	
 		
 }
 
-char* cal_operation_bit(char *oprator,const char *left, const char *right, const char *target)
+char* cal_operation_bit(char oprator,const char *left, const char *right, const char *target)
 {
-
 	sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
-	sprintf(string_buffer + strlen(string_buffer),"%s%s%s;\n",left,oprator,right);
+	sprintf(string_buffer + strlen(string_buffer),"%s%c%s;\n",left,oprator,right);
 		
 }
 
@@ -1109,82 +1114,11 @@ char* cal_operation_shift(char *oprator,const char *left, const char *right, con
 		
 }
 
+
 char* cal_operation(char oprator,const char *left, const char *right, const char *target)
 {
-	int temp;
-	int a,b;
-	if(is_number(left)&&is_number(right))
-	{
-		//cout<< "T1"<<endl;
-		a = atoi(left);
-		b = atoi(right);
-
-		char *rd_1 = new_registrator();
-		char *rd_2 = new_registrator();
-		/*cout<< rd_1 <<" = " << a <<endl;
-		cout<< rd_2 <<" = " << b <<endl;
-		cout<< target << " = ";*/
-		sprintf(string_buffer + strlen(string_buffer),"%s = %d;\n%s = %d;\n%s = ",rd_1,a,rd_2,b,target);
-
-		switch(oprator)
-		{
-			case '+':{
-				// cout<<rd_1<<"+"<<rd_2;
-				sprintf(string_buffer + strlen(string_buffer),"%s+%s",rd_1,rd_2);
-				break;
-			}
-			case '-':{
-				//cout<<rd_1<<"-"<<rd_2;
-				sprintf(string_buffer + strlen(string_buffer),"%s-%s",rd_1,rd_2);
-				break;
-			}
-			case '*':{
-				//cout<<rd_1<<"*"<<rd_2;
-				sprintf(string_buffer + strlen(string_buffer),"%s*%s",rd_1,rd_2);
-				break;
-			}
-			case '/':{
-				//cout<<rd_1<<"/"<<rd_2;
-				sprintf(string_buffer + strlen(string_buffer),"%s/%s",rd_1,rd_2);
-				break;
-			}
-			default: break;
-		}
-	}
-	else
-	{
-		//cout<< target << " = ";
-		sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
-		
-		//cout<< "T2"<<endl;
-		switch(oprator)
-		{
-			case '+':{
-				//cout<<left<<"+"<<right;
-				sprintf(string_buffer + strlen(string_buffer),"%s+%s",left,right);
-				break;
-			}
-			case '-':{
-				//cout<<left<<"-"<<right;
-				sprintf(string_buffer + strlen(string_buffer),"%s-%s",left,right);
-				break;
-			}
-			case '*':{
-				//cout<<left<<"*"<<right;
-				sprintf(string_buffer + strlen(string_buffer),"%s*%s",left,right);
-				
-				break;
-			}
-			case '/':{
-				//cout<<left<<"/"<<right;
-				sprintf(string_buffer + strlen(string_buffer),"%s/%s",left,right);
-				break;
-			}
-			default: break;
-		}
-	}
-	//cout<<";"<<endl;
-	sprintf(string_buffer + strlen(string_buffer),";\n");
+	sprintf(string_buffer + strlen(string_buffer),"%s = ",target);
+	sprintf(string_buffer + strlen(string_buffer),"%s%c%s;\n",left,oprator,right);
 }
 
 char* call_function(Symbol *func,char *para_list)
@@ -1199,7 +1133,7 @@ char* call_function(Symbol *func,char *para_list)
 	if(strcmp(func->name,"printLine")==0 )
 		{
 			//cout<<"printline();"<<endl;
-			sprintf(string_buffer + strlen(string_buffer),"printline();\n");
+			sprintf(string_buffer + strlen(string_buffer),"printLine();\n");
 		}
 	else
 	if(strcmp(func->name,"prints")==0 || strcmp(func->name,"printString")==0)
@@ -1261,26 +1195,23 @@ void assign_variable_type(char *type,Symbol *id)
 		id->type_size = 1;
 	else if(strcmp(type,"int")==0)
 		id->type_size = 4;
+	else if(strcmp(type,"unsigned")==0)
+		id->type_size = 4;
+	else if(strcmp(type,"boolean")==0)
+		id->type_size = 4;
 }
 
 char* string_connect(char *a, char *b)
 {
-	/*cout<<"TEST a: "<<a<<endl;
-	cout<<"TEST b: "<<b<<endl;
-	cout<<"TEST l1: "<<strlen(a)<<endl;
-	cout<<"TEST l2: "<<strlen(b)<<endl;*/
+
 	int newlen = strlen(a) + strlen(b);
-	/*cout<<"TEST newlen: "<<newlen<<endl;*/
+
 	char *r =  new char[newlen+1];
 
-/*	strcpy(r, a);
-	cout<<"TEST copy: "<<r<<endl;
-	strcat(r, b);
-	cout<<"TEST cat: "<<r<<endl;*/
+
 
 	sprintf(r,"%s%s",a,b);
-	/*cout<<"TEST output length: "<<strlen(r)<<endl;
-	cout<<"TEST output: "<<r<<endl;*/
+
 	return r;
 }
 
@@ -1307,6 +1238,12 @@ void assign_array_info(char *type, Symbol *id,int size)
 	{
 		id->array_location = char_size_level;
 		char_size_level += size;
+		
+	}
+	else if(strcmp(type,"unsigned")==0)
+	{
+		id->array_location = int_size_level;
+		int_size_level += size;
 		
 	}
 }

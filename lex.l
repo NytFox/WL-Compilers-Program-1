@@ -42,7 +42,7 @@ end									{
 int									{ fflush(stdout); return (INT);	}
 char								{ fflush(stdout); return (CHAR);	}
 void 								{ fflush(stdout); return (VOID);	}
-boolean								{ fflush(stdout); return (BOOL);	}
+boolean								{ fflush(stdout); return (BOOLEAN);	}
 long								{ fflush(stdout); return (LONG);	}
 enum								{ fflush(stdout); return (ENUM);	}
 unsigned							{ fflush(stdout); return (UNSIGNED);	}		
@@ -74,6 +74,13 @@ L?\"(\\.|[^\\"])*\"					{ yylval.stringstuff = yytext; return(STRING_LITERAL); }
 ";"									{ return (';');		}
 "*"									{ return ('*');		}
 "**"								{ return (EXPO);	}
+"^"									{ return ('^');		}
+"|"									{ return ('|');		}
+"&"									{ return ('&');		}
+"~"									{ return ('~');		}
+"%"									{ return ('%');		}
+"<<"								{ return (LEFT_SHIFT);		}
+">>"								{ return (RIGHT_SHIFT);		}
 "/"									{ return ('/');		}
 "-"									{ return ('-');		}
 "+"									{ return ('+');		}
@@ -84,12 +91,8 @@ L?\"(\\.|[^\\"])*\"					{ yylval.stringstuff = yytext; return(STRING_LITERAL); }
 ","									{ return (',');		}
 ":"									{ return (':');		}
 "."									{ return ('.');		}
-"<<"								{ return (LEFT_SHIFT);		}
-">>"								{ return (RIGHT_SHIFT);		}
-'^'									{ return ('^');		}
-'|'									{ return ('|');		}
-'&'									{ return ('&');		}
-'~'									{ return ('~');		}
+
+
 %%
 
 void process_id()
@@ -141,7 +144,7 @@ int assign_next_register()
            register.  This routine just chooses the next register in
            the range r4 to r31.  Registers r0-r3 are reserved for other
            purposes  */
-    if(register_number==0 || register_number==28)
+    if(register_number==27)
 	{
 		register_number = 1;
 	}
