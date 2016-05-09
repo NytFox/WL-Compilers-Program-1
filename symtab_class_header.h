@@ -1,7 +1,7 @@
 #ifndef SYMBOL_TABLE_HEADER
 #define SYMBOL_TABLE_HEADER
 
-#define HT_SIZE 1024
+#define HT_SIZE 666666
 #include <iostream>
 using namespace std;
 #include <string>

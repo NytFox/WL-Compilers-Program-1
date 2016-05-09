@@ -4,11 +4,17 @@
 Program_Initialization : Program
 		{
 			cout<<"int ";
-			for(int i = 0;i<28;i++)
+			for(int i = 0;i<RN;i++)
 			{
 				cout<<"r"<<i<<", ";
 			}
-			cout<<"r28;\n";
+			cout<<"r"<<RN<<";\n";
+			cout<<"int ";
+			for(int i = 0;i<DN;i++)
+			{
+				cout<<"d"<<i<<", ";
+			}
+			cout<<"d"<<DN<<";\n";
 			cout<<"int *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_array[66666666];\nchar char_array[66666666];\n";
 			cout<< $1;
 		}
@@ -60,7 +66,7 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				
 				char function_start_part[1000];
 				
-				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
+				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nd28=200;\nsp=sp+d28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
 				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
 				for(int i=1;i<=28;i++)
@@ -93,9 +99,9 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				
 				char function_start_part[1000];
 				if (strcmp("main",func_name)==0)
-					sprintf(function_start_part,"initstack();\ngoto BuildFramemain1;\nStartmain1:\n");
+					sprintf(function_start_part,"initstack();\ngoto BuildFramemain1;\nStart%s1:\n", func_name);
 				else
-					sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nr28=200;\nsp=sp+r28;\n",func_name,func_name);
+					sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nd28=200;\nsp=sp+d28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
 				if (strcmp("main",func_name)==0)
 					sprintf(function_buildframe_part,"return;\n",func_name);
@@ -359,7 +365,6 @@ statement : do_loop_statement
 
 do_loop_statement : do_begin statement_list do_end
 			{
-
 				char *return_string;
 				return_string = string_connect($1,$2);
 				return_string = string_connect(return_string,do_tmp_stack.top());	
@@ -378,7 +383,7 @@ do_begin : DO INTLITERAL ID '=' do_list
 
 				if(strcmp($5,"3")==0)
 				{
-					char *increment = new_registrator();
+					char *increment = new_d_registrator();
 
 					sprintf(variable_initialization,"%s=%s;\n",start,do_tmp_stack.top());
 					do_tmp_stack.pop();
@@ -420,7 +425,7 @@ do_begin : DO INTLITERAL ID '=' do_list
 				index = assign_next_lable();
 				do_stack.push(index);
 				//cout<<"L"<<index<<":"<<endl;
-				sprintf(tmp,"%sL%d: r28 = 0;\n",variable_initialization,index);
+				sprintf(tmp,"%sL%d: d28 = 0;\n",variable_initialization,index);
 				$$ = string_copy(tmp);
 
 
@@ -448,7 +453,7 @@ do_list : Expression ',' Expression
 
 do_end : INTLITERAL CONTINUE
 			{
-
+				
 				char tmp[1000];
 				int index = do_stack.top();
 				do_stack.pop();
@@ -500,7 +505,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
 				
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: r28 = 0;\n%s\ngoto L%d;\nL%d: r28 = 0;\n%s\nL%d: r28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
+				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: d28 = 0;\n%s\ngoto L%d;\nL%d: d28 = 0;\n%s\nL%d: d28 = 0;\n",tmp,med,top,$7,bot,med,$5,bot);
 
 			}
 			| IF '(' if_content ')' sBlock
@@ -531,7 +536,7 @@ if_statement : IF '(' if_content ')' sBlock ELSE sBlock
 				sprintf(string_buffer+strlen(string_buffer),"%s",if_tmp_stack.top());
 				if_tmp_stack.pop();
 				sprintf(string_buffer+strlen(string_buffer),"%s",upload);
-				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: r28 = 0;\ngoto L%d;\nL%d: r28 = 0;\n %s\nL%d: r28 = 0;\n",tmp,med,top,bot,med,$5,bot);
+				sprintf(string_buffer + strlen(string_buffer),"if(%s) goto L%d;\nL%d: d28 = 0;\ngoto L%d;\nL%d: d28 = 0;\n %s\nL%d: d28 = 0;\n",tmp,med,top,bot,med,$5,bot);
 
 				
 				
@@ -728,33 +733,33 @@ Expression : Expression '&' BitTerm
 		{
 			
 			//cout<<"EXP BIT"<<endl;
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 		    cal_operation_bit('&',$1,$3,rd);
 		    $$ = rd;
 		}
 		| Expression '|' BitTerm
 		{
 			//cout<<"EXP BIT"<<endl;
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 		    cal_operation_bit('|',$1,$3,rd);
 		    $$ = rd;
 		}
 		| Expression '^' BitTerm
 		{
 			//cout<<"EXP BIT"<<endl;
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 		    cal_operation_bit('^',$1,$3,rd);
 		    $$ = rd;
 		}
 		| '&' BitTerm
 		{
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 			cal_operation_bit_2('&',$2,rd);
 			$$ = rd;
 		}
 		| '~' BitTerm
 		{
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 			cal_operation_bit_2('~',$2,rd);
 			$$ = rd;
 		}
@@ -768,7 +773,7 @@ BitTerm : BitTerm LEFT_SHIFT ShiftTerm
 		{
 			char left_shift[]="<<";
 			char *tmp = string_copy(left_shift);
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 		    cal_operation_shift(tmp,$1,$3,rd);
 		    $$ = rd;
 		}
@@ -776,7 +781,7 @@ BitTerm : BitTerm LEFT_SHIFT ShiftTerm
 		{
 			char left_shift[]=">>";
 			char *tmp = string_copy(left_shift);
-			char *rd = new_registrator();
+			char *rd = new_d_registrator();
 		    cal_operation_shift(tmp,$1,$3,rd);
 		    $$ = rd;
 		}
@@ -790,7 +795,7 @@ BitTerm : BitTerm LEFT_SHIFT ShiftTerm
 ShiftTerm : ShiftTerm '+' term
 		{
 		    //printf("\nSeen ADD_OP\n\n"); 
-		    char *rd = new_registrator();
+		    char *rd = new_d_registrator();
 		    cal_operation('+',$1,$3,rd);
 		    $$ = rd;
 
@@ -799,7 +804,7 @@ ShiftTerm : ShiftTerm '+' term
 		{
 		    //printf("\nSeen ADD_OP\n\n"); 
 
-		   	char *rd = new_registrator();
+		   	char *rd = new_d_registrator();
 		    //cout<< rd <<" = " << $1 << " - "<< $3<<";"<<endl;
 		    cal_operation('-',$1,$3,rd);
 		    $$ = rd;
@@ -817,7 +822,7 @@ term : 	term '*' factor
 		{
 		     //printf("\nSeen MUL_OP \n\n"); 
 
-		    char *rd = new_registrator();
+		    char *rd = new_d_registrator();
 		    cal_operation('*',$1,$3,rd);
 			
 		    $$ = rd;
@@ -826,7 +831,7 @@ term : 	term '*' factor
 		{
 		     //printf("\nSeen MUL_OP \n\n"); 
 
-		    char *rd = new_registrator();
+		    char *rd = new_d_registrator();
 		    cal_operation('/',$1,$3,rd);
 		    $$ = rd;
 		}
@@ -834,7 +839,7 @@ term : 	term '*' factor
 		{
 		     //printf("\nSeen MUL_OP \n\n"); 
 
-		    char *rd = new_registrator();
+		    char *rd = new_d_registrator();
 		    cal_operation('%',$1,$3,rd);
 		    $$ = rd;
 		}
@@ -910,7 +915,7 @@ call_id : ID '[' Expression_list ']'
 
 					char init_part[1000];
 					char target_part[1000];
-					char *init = new_registrator();
+					char *init = new_d_registrator();
 					sprintf(init_part,"%s = 1;\n",init);
 
 					
@@ -922,8 +927,8 @@ call_id : ID '[' Expression_list ']'
 					}
 
 				
-					char *data_shift = new_registrator();
-					char *total_shift = new_registrator();
+					char *data_shift = new_d_registrator();
+					char *total_shift = new_d_registrator();
 
 					sprintf(init_part + strlen(init_part),"%s = %s * 4;\n%s = %s + %d;\n",data_shift,init,total_shift,data_shift,$1->array_location);
 					sprintf(target_part,"*(int_array+%s)",total_shift);
@@ -938,7 +943,7 @@ call_id : ID '[' Expression_list ']'
 				{
 					char init_part[1000];
 					char target_part[1000];
-					char *init = new_registrator();
+					char *init = new_d_registrator();
 					sprintf(init_part,"%s = 1;\n",init);
 
 					
@@ -950,8 +955,8 @@ call_id : ID '[' Expression_list ']'
 					}
 
 				
-					char *data_shift = new_registrator();
-					char *total_shift = new_registrator();
+					char *data_shift = new_d_registrator();
+					char *total_shift = new_d_registrator();
 
 					sprintf(init_part + strlen(init_part),"%s = %s;\n%s = %s + %d;\n",data_shift,init,total_shift,data_shift,$1->array_location);
 					sprintf(target_part,"*(char_array+%s)",total_shift);
@@ -1027,8 +1032,19 @@ char *new_registrator()
 	strcpy(result,"r");
 	sprintf(buffer,"%d",assign_next_register());
 	strcat(result,buffer);
+	return result;
+}
 
-	register_num++;
+char *new_d_registrator()
+{
+
+	char buffer[10];
+	char *result;
+	result = (char *)malloc(4);  /*  tacky, but should be big enuff  */
+
+	strcpy(result,"d");
+	sprintf(buffer,"%d",d_assign_next_register());
+	strcat(result,buffer);
 	return result;
 }
 
@@ -1053,7 +1069,7 @@ char *Calc_exponential(const char *r1, const char *r2)
 			cout<<rx<<" = "<<rx<<"*"<<r1<<";"<<endl;
 			cout<<rt_i<<" = "<<rt_i<<" + 1;"<<endl;
 			cout<<"if("<<r2<<">"<<rt_i<<") goto L"<<l<<";"<<endl;*/
-			sprintf(string_buffer + strlen(string_buffer),"%s= 0;\n%s= 1;\nL%d: r28 = 0;\n%s = %s*%s;\n%s = %s + 1;\nif(%s>%s) goto L%d;\n",rt_i,rx,l,rx,rx,r1,rt_i,rt_i,r2,rt_i,l);
+			sprintf(string_buffer + strlen(string_buffer),"%s= 0;\n%s= 1;\nL%d: d28 = 0;\n%s = %s*%s;\n%s = %s + 1;\nif(%s>%s) goto L%d;\n",rt_i,rx,l,rx,rx,r1,rt_i,rt_i,r2,rt_i,l);
 
 			return rx;
 }

@@ -14,13 +14,19 @@ extern "C"
 #include "y.tab.h"
 #include <iostream>
 using namespace std;
+int RN = 28;
+int DN = 28;
 int begin_skip = 0;
 int scope_count = 0;
 void process_id();
 int register_number = 1;
+int d_register_number = 1;
 int assign_next_register();
+int assign_next_d_register();
 void enter_scope();
 void leave_scope();
+char *string_copy(char *str);
+
 
 %}
 
@@ -68,7 +74,7 @@ le 									{ fflush(stdout); return (LE);	}
 
 {IntLit}							{ yylval.intstuff = atoi(yytext);
 				          			  return (INTLITERAL);	}
-L?\"(\\.|[^\\"])*\"					{ yylval.stringstuff = yytext; return(STRING_LITERAL); }			          			  
+L?\"(\\.|[^\\"])*\"					{ yylval.stringstuff = strdup(yytext);fflush(stdout);return(STRING_LITERAL); }			          			  
 
 "="									{ return ('=');		}
 ";"									{ return (';');		}
@@ -103,7 +109,6 @@ void process_id()
 	    a field "stuff" which has the acutal symbol table goodies,
 	    like a character string "key" and an integer "register number."
 	*/
-
 	Symbol *t;
 	t = new_table -> Search_symbol(yytext);
 	if(!t)
@@ -118,7 +123,7 @@ void process_id()
 	{
 	    /* the identifier (whose name is stored in yytext) is already
                in the symbol table.  */
-		// cout<<"yytext already existed"<<endl;
+		 //cout<<"yytext already existed"<<endl;
 	}
 	yylval.symbolstuff = t;
         /*printf("in process get id %s\n",yylval.symbolstuff->name);*/
@@ -144,14 +149,32 @@ int assign_next_register()
            register.  This routine just chooses the next register in
            the range r4 to r31.  Registers r0-r3 are reserved for other
            purposes  */
-    if(register_number==27)
+    if(register_number==(RN-1))
 	{
 		register_number = 1;
 	}
 	else
 	{
-		register_number = (register_number + 1) % 28;
+		register_number = (register_number + 1) % RN;
 	}
 	//cout<<"TEST: "<<register_number<<endl;
 	return register_number;
+}
+
+int d_assign_next_register()
+{
+	/* The compiler allocates each variable to a different machine
+           register.  This routine just chooses the next register in
+           the range r4 to r31.  Registers r0-r3 are reserved for other
+           purposes  */
+    if(d_register_number==(DN-1))
+	{
+		d_register_number = 1;
+	}
+	else
+	{
+		d_register_number = (d_register_number + 1) % DN;
+	}
+	//cout<<"TEST: "<<d_register_number<<endl;
+	return d_register_number;
 }

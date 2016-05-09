@@ -15,6 +15,7 @@ void generate_exp(Symbol *symbol,const char *rhs);
 int yyerror(const char *s);
 void generate_copy(Symbol* symbol,int value);
 char *new_registrator();
+char *new_d_registrator();
 char* function_call(Symbol *func, Symbol *para);
 char *Calc_exponential(const char *r1,const char *r2);
 int assign_next_lable();
@@ -25,6 +26,7 @@ char* cal_operation_shift(char *oprator,const char *left, const char *right, con
 char* cal_operation_bit(char oprator,const char *left, const char *right, const char *target);
 char* cal_operation_bit_2(char oprator,const char *right, const char *target);
 extern int assign_next_register();
+extern int d_assign_next_register();
 extern void enter_scope();
 extern void leave_scope();
 char *revise(char* str);
@@ -41,6 +43,8 @@ char *string_copy(char *str);
 int getParaNumber(char *para_list);
 char** return_para_list(char *para_list,int para_num);
 //global variables
+extern int RN;
+extern int DN;
 stack<char *> array_target_location;
 stack<int> if_stack;
 stack<int> do_stack;
@@ -57,8 +61,6 @@ char empty_label[]="";
 char two_para[]="2";
 char three_para[]="3";
 int parameter_fp_count = 0;
-
-int register_num = 0;
 %}
 
 %union 

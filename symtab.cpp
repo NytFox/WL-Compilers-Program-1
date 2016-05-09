@@ -77,6 +77,7 @@ Symbol* Scope::Empty_table(){
 
 unsigned int Scope::Hash_value(const char* s){
 	unsigned hv = 0;
+	
 	while(*s != '\0'){
 		hv = hv + *s;
 		s++;
