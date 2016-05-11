@@ -15,8 +15,10 @@ Program_Initialization : Program
 				cout<<"d"<<i<<", ";
 			}
 			cout<<"d"<<DN<<";\n";
-			cout<<"int *iptr1;\nchar *cptr1;\nchar *fp, *sp;\nchar int_array[66666666];\nchar char_array[66666666];\n";
+			cout<<"int *iptr1;\nchar *cptr1;\nchar **tmp;\nchar *fp, *sp;\nchar int_array[66666666];\nchar char_array[66666666];\n";
+			cout<<"void fp_push(char *value){tmp++; *tmp = value;}\nvoid fp_pop(){tmp--;}\n";
 			cout<< $1;
+			
 		}
 		;
 
@@ -67,9 +69,9 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				
 				char function_start_part[5000];
 				
-				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nd28=200;\nsp=sp+d28;\n",func_name,func_name);
+				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\n",func_name,func_name);
 				char function_buildframe_part[5000];
-				sprintf(function_buildframe_part,"BuildFrame%s1:\nsp=sp+200;\n",func_name);
+				sprintf(function_buildframe_part,"return;\nBuildFrame%s1:\nsp=sp+200;\n",func_name);
 				for(int i=1;i<=28;i++)
 				{
 					int fp_move = 48 + (i-1)*4;
@@ -100,13 +102,13 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				
 				char function_start_part[5000];
 				if (strcmp("main",func_name)==0)
-					sprintf(function_start_part,"initstack();\ngoto BuildFramemain1;\nStart%s1:\n", func_name);
+					sprintf(function_start_part,"initstack();\ntmp = (char **)malloc(sizeof(char*) * 1024);\ngoto BuildFramemain1;\nStart%s1:\n", func_name);
 				else
-					sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nd28=200;\nsp=sp+d28;\n",func_name,func_name);
+					sprintf(function_start_part+strlen(function_start_part),"goto BuildFrame%s1;\nStart%s1:\n",func_name,func_name);
 				char function_buildframe_part[5000];
 				if (strcmp("main",func_name)==0)
 					sprintf(function_buildframe_part,"return;\n",func_name);
-				sprintf(function_buildframe_part+strlen(function_buildframe_part),"BuildFrame%s1:\nsp=sp+200;\n",func_name);
+				sprintf(function_buildframe_part+strlen(function_buildframe_part),"return;\nBuildFrame%s1:\nsp=sp+200;\n",func_name);
 				for(int i=1;i<=28;i++)
 				{
 					int fp_move = 48 + (i-1)*4;
@@ -1191,13 +1193,13 @@ char* call_function(Symbol *func,char *para_list)
 				reg_tmp_stack.pop();
 				sprintf(string_buffer + strlen(string_buffer),"pushi(%s);\n",tmp);	
 			}
-			sprintf(string_buffer + strlen(string_buffer),"pushi(fp);\nfp=sp-4;\n%s();\n",func->name);	
+			sprintf(string_buffer + strlen(string_buffer),"pushi(fp);\nfp_push(fp);\nfp=sp-4;\n%s();\n",func->name);	
 			for(int i=1;i<=28;i++)
 				{
 					int fp_move = 48 + (i-1)*4;
 					sprintf(string_buffer + strlen(string_buffer),"r%d=*(fp+%d);\n",i,fp_move);
 				}
-			sprintf(string_buffer + strlen(string_buffer),"sp=sp-200;\n");
+			sprintf(string_buffer + strlen(string_buffer),"fp = *tmp;\nfp_pop();\nsp=fp+4;\n");
 		}
 		
 	}
