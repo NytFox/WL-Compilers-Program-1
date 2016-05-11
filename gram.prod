@@ -48,10 +48,11 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 			{
 				leave_scope();
 				parameter_fp_count = 0;
+				char rg_tmp[5000];
 				//part for para+type+declaration
-				char rg_tmp[1000];
 				while(!parameter_list_stack.empty())
 					{
+						//cout<<"TEST:"<<rg_tmp<<endl;
 						Symbol *tmp_symbol = parameter_list_stack.top();
 						sprintf(rg_tmp+strlen(rg_tmp),"r%d=*(fp-%d);\n",tmp_symbol->offset,tmp_symbol->type_size+parameter_fp_count);
 						parameter_fp_count += tmp_symbol->type_size;
@@ -64,7 +65,7 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				char left_bracket[] = "\n{\n";
 				char right_bracket[] = "\n}\n";
 				
-				char function_start_part[1000];
+				char function_start_part[5000];
 				
 				sprintf(function_start_part,"goto BuildFrame%s1;\nStart%s1:\nfp = *(fp + 0);\nd28=200;\nsp=sp+d28;\n",func_name,func_name);
 				char function_buildframe_part[5000];
@@ -80,7 +81,7 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				return_string = string_connect(return_string,left_bracket);
 				return_string = string_connect(return_string,function_start_part);
 				return_string = string_connect(return_string,rg_tmp);
-				//return_string = string_connect(return_string,$7);
+				return_string = string_connect(return_string,$7);
 				return_string = string_connect(return_string,$8);
 				return_string = string_connect(return_string,function_buildframe_part);
 				return_string = string_connect(return_string,right_bracket);
@@ -97,7 +98,7 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				char left_bracket[] = "\n{\n";
 				char right_bracket[] = "\n}\n";
 				
-				char function_start_part[1000];
+				char function_start_part[5000];
 				if (strcmp("main",func_name)==0)
 					sprintf(function_start_part,"initstack();\ngoto BuildFramemain1;\nStart%s1:\n", func_name);
 				else
@@ -116,8 +117,6 @@ Function :  ID '(' Parameter_list ')' ':' type declaration sBlock
 				return_string = string_connect(func_name,double_pths);
 				return_string = string_connect(return_string,left_bracket);
 				return_string = string_connect(return_string,function_start_part);
-				return_string = string_connect(return_string,$3);
-				//return_string = string_connect(return_string,$7);
 				return_string = string_connect(return_string,$7);
 				return_string = string_connect(return_string,function_buildframe_part);
 				return_string = string_connect(return_string,right_bracket);
